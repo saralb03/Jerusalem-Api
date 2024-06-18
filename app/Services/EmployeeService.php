@@ -7,16 +7,29 @@ use App\Models\Employee;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Validators\EmployeeValidator;
 class EmployeeService
 {
-    public function index(): Collection
+    public function index(array $requestedColumns)
     {
-        $employees = Employee::withTrashed()
-            ->get();
+        // Retrieve requested columns from query parameter, default to all if not specified
+        // $requestedColumns = $request->query('columns') ? explode(',', $request->query('columns')) : null;
 
-        return $employees;
+        // Convert camelCase column names to snake_case
+        if ($requestedColumns) {
+            $requestedColumns = array_map(function ($column) {
+                return Str::snake($column);// Use snake_case() to convert camelCase to snake_case
+            }, $requestedColumns);
+        }
+
+        // Fetch employees with requested columns or all columns if none specified
+        $employees = $requestedColumns ?
+            Employee::select($requestedColumns)->get() :
+            Employee::all();
+
+        return response()->json($employees);
     }
 
     public function updateData()
@@ -31,7 +44,7 @@ class EmployeeService
         }
     }
 
-    public function update(Request $request)
+    public function update()
     {
         $filePath = "C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv";
 

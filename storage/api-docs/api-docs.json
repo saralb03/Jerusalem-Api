@@ -1,0 +1,161 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Employee API",
+        "description": "API documentation for managing employees",
+        "contact": {
+            "name": "API Support",
+            "email": "contact@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/employees": {
+            "get": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Get employees with optional filtering of columns",
+                "operationId": "7fc06f144c1cd7925c5c391a6609f02d",
+                "parameters": [
+                    {
+                        "name": "columns",
+                        "in": "query",
+                        "description": "Comma-separated list of columns to retrieve",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "id,personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,phone_number,deleted_at"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of employees",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Employee"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Employee": {
+                "required": [
+                    "id",
+                    "personal_id",
+                    "personal_number",
+                    "ranks",
+                    "surname",
+                    "first_name",
+                    "department",
+                    "division",
+                    "service_type",
+                    "date_of_birth",
+                    "service_type_code",
+                    "security_class_start_date",
+                    "service_start_date",
+                    "solider_type",
+                    "age",
+                    "classification",
+                    "phone_number",
+                    "deleted_at"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "personal_id": {
+                        "type": "string",
+                        "example": "209959501"
+                    },
+                    "personal_number": {
+                        "type": "string",
+                        "example": "5252568"
+                    },
+                    "ranks": {
+                        "type": "string",
+                        "example": "Ravet"
+                    },
+                    "surname": {
+                        "type": "string",
+                        "example": "Gorinstein"
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "Sarah Leah"
+                    },
+                    "department": {
+                        "type": "string",
+                        "example": ""
+                    },
+                    "division": {
+                        "type": "string",
+                        "example": "Chetz"
+                    },
+                    "service_type": {
+                        "type": "string",
+                        "example": "חובה"
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2003-06-03"
+                    },
+                    "service_type_code": {
+                        "type": "string",
+                        "example": "1"
+                    },
+                    "security_class_start_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2006-05-04"
+                    },
+                    "service_start_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2008-07-04"
+                    },
+                    "solider_type": {
+                        "type": "string",
+                        "example": "חייל"
+                    },
+                    "age": {
+                        "type": "integer",
+                        "example": 21
+                    },
+                    "classification": {
+                        "type": "string",
+                        "example": "4"
+                    },
+                    "phone_number": {
+                        "type": "string",
+                        "example": "055-9254116"
+                    },
+                    "deleted_at": {
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            }
+        }
+    }
+}
