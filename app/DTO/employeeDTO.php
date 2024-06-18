@@ -8,7 +8,7 @@ class EmployeeDTO
 {
     public $personal_id;
     public $personal_number;
-    public $note;
+    public $prefix;
     public $ranks;
     public $surname;
     public $first_name;
@@ -28,15 +28,16 @@ class EmployeeDTO
     {
 
         match ($data['service_type']) {
-            ServiceType::MISSION_CIVILAN->value => $note = 'C',
+            ServiceType::MISSION_CIVILAN->value => $prefix = 'C',
             ServiceType::DUTY->value, ServiceType::DUTY_REGULARITY->value, 
-            ServiceType::DISCHARGE->value, ServiceType::REGULARITY->value => $note = 'S',
-            ServiceType::RESERVES, ServiceType::VOLUNTERR_RESERVES->value => $note = 'M',
-            default => $note = '',
+            ServiceType::DISCHARGE->value, ServiceType::REGULARITY->value => $prefix = 'S',
+            ServiceType::RESERVES, ServiceType::VOLUNTERR_RESERVES->value => $prefix = 'M',
+            default => $prefix = '',
         };
+
         $this->personal_id = $data['personal_id'];
         $this->personal_number = $data['personal_number'];
-        $this->note = $note;
+        $this->prefix = $prefix;
         $this->ranks = $data['ranks'];
         $this->surname = $data['surname'];
         $this->first_name = $data['first_name'];

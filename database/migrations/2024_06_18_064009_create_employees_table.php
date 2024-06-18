@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('personal_id');
             $table->string('personal_number');
+            $table->string('prefix');
             $table->string('ranks');
             $table->string('surname');
             $table->string('first_name');

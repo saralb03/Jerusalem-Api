@@ -6,9 +6,7 @@ use App\DTO\EmployeeDTO;
 use App\Models\Employee;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use App\Validators\EmployeeValidator;
 class EmployeeService
 {
