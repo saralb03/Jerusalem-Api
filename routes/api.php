@@ -14,7 +14,7 @@ Route::get('/user', function (Request $request) {
 //     });
 
 Route::controller(EmployeeController::class)
-    // ->prefix('/employees')
+    ->prefix('/employees')
     // ->middleware(['verify.cookie', 'auth:api', 'role:admin|task_manager'])
     ->group(function () {
         Route::get('/', 'index');
