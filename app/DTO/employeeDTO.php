@@ -22,7 +22,11 @@ class EmployeeDTO
     public $solider_type;
     public $age;
     public $classification;
+    public $classification_name;
     public $phone_number;
+    public $population_id;
+    public $employee_id; 
+    public $user_name;
 
     public function __construct(array $data)
     {
@@ -51,7 +55,10 @@ class EmployeeDTO
         $this->solider_type = $data['solider_type'];
         $this->age = $data['age'];
         $this->classification = $data['classification'];
+        $this->classification_name = "hi";
+        $this->population_id = $data['population_id'];
         $this->phone_number = $data['phone_number'];
+        $this->user_name = $data['user_name'];
     }
 
     private function convertDate($date)

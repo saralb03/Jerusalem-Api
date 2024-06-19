@@ -26,7 +26,7 @@
                         "schema": {
                             "type": "string"
                         },
-                        "example": "id,personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,phone_number,deleted_at"
+                        "example": "id,personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at"
                     }
                 ],
                 "responses": {
@@ -73,6 +73,7 @@
                     "solider_type",
                     "age",
                     "classification",
+                    "classification_name",
                     "phone_number",
                     "deleted_at"
                 ],
@@ -123,8 +124,8 @@
                         "example": "2003-06-03"
                     },
                     "service_type_code": {
-                        "type": "string",
-                        "example": "1"
+                        "type": "integer",
+                        "example": 1
                     },
                     "security_class_start_date": {
                         "type": "string",
@@ -145,8 +146,16 @@
                         "example": 21
                     },
                     "classification": {
+                        "type": "integer",
+                        "example": 4
+                    },
+                    "classification_name": {
                         "type": "string",
-                        "example": "4"
+                        "example": "סודי"
+                    },
+                    "population_id": {
+                        "type": "integer",
+                        "example": 1
                     },
                     "phone_number": {
                         "type": "string",
