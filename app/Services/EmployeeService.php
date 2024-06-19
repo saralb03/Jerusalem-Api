@@ -56,7 +56,6 @@ class EmployeeService
 
         if (file_exists($filePath)) {
             $fileContents = file($filePath);
-
             $headers = str_getcsv(array_shift($fileContents));
             $dbHeaders = array_map(function ($header) use ($columnMapping) {
                 return $columnMapping[$header] ?? null;

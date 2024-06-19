@@ -10,12 +10,14 @@ class EmployeeValidator
     public static function validate(array $dto)
     {
         $validator = Validator::make($dto, [
-            'personal_id' => 'required|integer|digits:9',
-            'personal_number' => 'required|integer|digits:7',
+            'personal_id' => 'required|string|max:9|regex:/^\d+$/',
+            'personal_number' => 'required|integer|digits:7|regex:/^\d+$/',
             'ranks' => 'required|string',
             'surname' => 'required|string',
             'first_name' => 'required|string',
             'department' => 'nullable|string',
+            'branch' => 'nullable|string',
+            'section' => 'nullable|string',
             'division' => 'required|string',
             'service_type' => [
                 'required',
@@ -29,7 +31,8 @@ class EmployeeValidator
             'solider_type' => 'required|string',
             'age' => 'required|integer',
             'classification' => 'required|integer',
-            'phone_number' => 'required|string',
+            'phone_number' => 'nullable',
+            'population_id' => 'required|integer'
         ]);
 
         return $validator->passes();
