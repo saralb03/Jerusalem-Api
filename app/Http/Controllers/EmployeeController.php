@@ -17,7 +17,7 @@ use OpenApi\Annotations as OA;
  * )
  * @OA\Schema(
  *     schema="Employee",
- *     required={"id", "personal_id", "personal_number", "ranks", "surname", "first_name", "department", "division", "service_type", "date_of_birth", "service_type_code", "security_class_start_date", "service_start_date", "solider_type", "age", "classification", "phone_number", "deleted_at"},
+ *     required={"id", "personal_id", "personal_number", "ranks", "surname", "first_name", "department", "division", "service_type", "date_of_birth", "service_type_code", "security_class_start_date", "service_start_date", "solider_type", "age", "classification", "classification_name", "phone_number", "deleted_at"},
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="personal_id", type="string", example="209959501"),
  *     @OA\Property(property="personal_number", type="string", example="5252568"),
@@ -29,12 +29,14 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="division", type="string", example="Chetz"),
  *     @OA\Property(property="service_type", type="string", example="חובה"),
  *     @OA\Property(property="date_of_birth", type="string", format="date", example="2003-06-03"),
- *     @OA\Property(property="service_type_code", type="string", example="1"),
+ *     @OA\Property(property="service_type_code", type="integer", example=1),
  *     @OA\Property(property="security_class_start_date", type="string", format="date", example="2006-05-04"),
  *     @OA\Property(property="service_start_date", type="string", format="date", example="2008-07-04"),
  *     @OA\Property(property="solider_type", type="string", example="חייל"),
  *     @OA\Property(property="age", type="integer", example=21),
- *     @OA\Property(property="classification", type="string", example="4"),
+ *     @OA\Property(property="classification", type="integer", example=4),
+ *     @OA\Property(property="classification_name", type="string", example="סודי"),
+ *     @OA\Property(property="population_id", type="integer", example=1),
  *     @OA\Property(property="phone_number", type="string", example="055-9254116"),
  *     @OA\Property(property="deleted_at", type="string", nullable=true, example=null),
  * )
@@ -58,7 +60,7 @@ class EmployeeController extends Controller
      *         in="query",
      *         description="Comma-separated list of columns to retrieve",
      *         required=false,
-     *         example="id,personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,phone_number,deleted_at",
+     *         example="id,personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at",
      *         @OA\Schema(type="string")
      *     ),
      *     @OA\Response(

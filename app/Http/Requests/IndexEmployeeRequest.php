@@ -30,6 +30,8 @@ class IndexEmployeeRequest extends FormRequest
             'surname',
             'first_name',
             'department',
+            'branch',
+            'section',
             'division',
             'service_type',
             'date_of_birth',
@@ -39,6 +41,8 @@ class IndexEmployeeRequest extends FormRequest
             'solider_type',
             'age',
             'classification',
+            'classification_name',
+            'population_id',
             'phone_number',
         ];
 
