@@ -5,8 +5,9 @@ namespace App\Services;
 use App\DTO\EmployeeDTO;
 use App\Models\Details;
 use App\Models\Employee;
-use App\Validators\DetailsValidator;
+use App\Validators\EmployeeValidator;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -14,40 +15,24 @@ class EmployeeService
 {
     public function index(array $requestedColumns)
     {
-        // Retrieve requested columns from query parameter, default to all if not specified
-        // $requestedColumns = $request->query('columns') ? explode(',', $request->query('columns')) : null;
-
-        // Convert camelCase column names to snake_case
         if ($requestedColumns) {
             $requestedColumns = array_map(function ($column) {
-                return Str::snake($column); // Use snake_case() to convert camelCase to snake_case
+                return Str::snake($column);
             }, $requestedColumns);
         }
 
-        // Fetch employees with requested columns or all columns if none specified
-        $employees = $requestedColumns ?
-            Employee::select($requestedColumns)->get() :
-            Employee::all();
-
+        $employees = $requestedColumns
+            ? Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
+            ->select($requestedColumns)
+            ->get()
+            : Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
+            ->get();
         return response()->json($employees);
     }
 
-    // public function updateData()
-    // {
-    //     $employees = Employee::query()
-    //         ->get();
-
-    //     foreach ($employees as $employee) {
-    //         $employee->update([
-    //             'updated_at' => Carbon::now()
-    //         ]);
-    //     }
-    // }
-
     public function update()
     {
-        $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees.csv";
-        // Column mapping from CSV to database
+        $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees+1.csv";
         $columnMapping = [
             'תז' => 'personal_id',
             'מספר אישי' => 'personal_number',
@@ -71,39 +56,39 @@ class EmployeeService
 
         if (file_exists($filePath)) {
             $fileContents = file($filePath);
-            
+
             $headers = str_getcsv(array_shift($fileContents));
             $dbHeaders = array_map(function ($header) use ($columnMapping) {
                 return $columnMapping[$header] ?? null;
             }, $headers);
-            
+
             $employeeDTOs = [];
             $csvPersonalIds = [];
             foreach ($fileContents as $line) {
                 $data = str_getcsv($line);
                 $employeeData = array_combine($dbHeaders, $data);
-                
-                if (!DetailsValidator::validate($employeeData)) {
+
+                if (!EmployeeValidator::validate($employeeData)) {
                     continue;
                 }
-                
+
                 $employeeDTO = new EmployeeDTO($employeeData);
-                
+
                 $employeeDTOs[] = $employeeDTO;
                 $csvPersonalIds[] = $employeeDTO->personal_id;
-                // $csvPersonalNumbers[] = $employeeData["personal_number"];
+                $csvPersonalNumbers[] = $employeeData["personal_number"];
             }
-            
+
             DB::beginTransaction();
             try {
-                // Soft delete employees not in the CSV
-                // Employee::whereNotIn('personal_number', $csvPersonalNumbers)->delete();
-                Details::whereNotIn('personal_id', $csvPersonalIds)->delete();
-                
-                
-                // Save all valid DTOs to the database using updateOrCreate
+                $employees = Employee::whereNotIn('personal_number', $csvPersonalNumbers)->get();
+                foreach ($employees as $employee) {
+                    $employee->details()->delete();
+                    $employee->delete();
+                }
+
+
                 foreach ($employeeDTOs as $dto) {
-                    // dd($dto);
                     $employee = Employee::withTrashed()->updateOrCreate(
                         ['personal_number' => $dto->personal_number],
                         (array)$dto
@@ -116,19 +101,16 @@ class EmployeeService
                         (array)$dto
                     );
 
-                    // Restore if it was soft deleted
                     if ($employee->trashed()) {
                         $employee->restore();
                         $details->restore();
                     }
                 }
 
-                // Commit the transaction
                 DB::commit();
 
                 return redirect()->back()->with('success', 'CSV file imported successfully.');
             } catch (\Exception $e) {
-                // Rollback the transaction on error
                 DB::rollBack();
 
                 return redirect()->back()->with('error', 'Error importing CSV file: ' . $e->getMessage());
@@ -137,4 +119,51 @@ class EmployeeService
 
         return redirect()->back()->with('error', 'File not found.');
     }
+
+    public function import(Request $request)
+{
+    // Validate the request to ensure a file is uploaded
+    $request->validate([
+        'file' => 'required|mimes:csv,txt|max:2048', // Adjust max file size as needed
+    ]);
+
+    // Retrieve the uploaded file from the request
+    $file = $request->file('file');
+
+    // Check if file upload was successful
+    if ($file) {
+        try {
+            // Read file contents into an array of lines
+            $fileContents = file($file->getPathname());
+
+            // Process each line in the CSV file
+            foreach ($fileContents as $line) {
+                // Parse CSV line into an array of data
+                $data = str_getcsv($line);
+
+                // Update or create Employee based on personal_number
+                $employee = Employee::withTrashed()->updateOrCreate([
+                    'personal_number' => $data["personal_number"],
+                ], [
+                    'user_name' => $data["user_name"], // Update user_name if record exists
+                    // Add other fields to update or create as needed
+                ]);
+
+                // Restore the employee if it was soft deleted
+                if ($employee->trashed()) {
+                    $employee->restore();
+                }
+            }
+
+            return redirect()->back()->with('success', 'CSV file imported successfully.');
+        } catch (\Exception $e) {
+            // Handle exceptions (e.g., file reading errors, database errors)
+            return redirect()->back()->with('error', 'Error importing CSV file: ' . $e->getMessage());
+        }
+    }
+
+    // Handle case where no file was uploaded (though should be covered by validation)
+    return redirect()->back()->with('error', 'No file uploaded.');
+}
+
 }

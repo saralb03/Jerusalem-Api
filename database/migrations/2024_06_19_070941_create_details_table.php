@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('employee_id');
             $table->string('personal_id')->nullable()->unique();
             $table->string('prefix')->nullable();
             $table->string('ranks')->nullable();
@@ -37,6 +36,7 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
             
+            $table->unsignedBigInteger('employee_id');
             $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
         });
     }

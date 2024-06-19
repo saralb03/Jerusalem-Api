@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\IndexEmployeeRequest;
 use App\Services\EmployeeService;
+use Illuminate\Http\Request;
 use OpenApi\Annotations as OA;
 /**
  *  * @OA\Info(
@@ -90,5 +91,11 @@ class EmployeeController extends Controller
     public function update()
     {
         return $this->employeeService->update();
+    }
+
+    public function import(Request $request)
+    {
+        // $file = $request->file('file');
+        return $this->employeeService->import($request);
     }
 }

@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Enums\ServiceType;
 use Illuminate\Validation\Rule;
 
-class DetailsValidator
+class EmployeeValidator
 {
     public static function validate(array $dto)
     {
