@@ -90,6 +90,10 @@
                         "type": "string",
                         "example": "5252568"
                     },
+                    "prefix": {
+                        "type": "string",
+                        "example": "S"
+                    },
                     "ranks": {
                         "type": "string",
                         "example": "Ravet"

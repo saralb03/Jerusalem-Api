@@ -47,7 +47,6 @@ class EmployeeService
     public function update()
     {
         $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees.csv";
-
         // Column mapping from CSV to database
         $columnMapping = [
             'תז' => 'personal_id',
@@ -111,7 +110,7 @@ class EmployeeService
                     );
 
                     $dto->employee_id = $employee->id;
-                    
+
                     $details = Details::withTrashed()->updateOrCreate(
                         ['personal_id' => $dto->personal_id],
                         (array)$dto
