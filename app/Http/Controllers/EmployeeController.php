@@ -21,6 +21,7 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="personal_id", type="string", example="209959501"),
  *     @OA\Property(property="personal_number", type="string", example="5252568"),
+ *     @OA\Property(property="prefix", type="string", example="S"),
  *     @OA\Property(property="ranks", type="string", example="Ravet"),
  *     @OA\Property(property="surname", type="string", example="Gorinstein"),
  *     @OA\Property(property="first_name", type="string", example="Sarah Leah"),
