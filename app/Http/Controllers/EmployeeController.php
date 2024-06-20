@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\IndexEmployeeRequest;
 use App\Services\EmployeeService;
+use Illuminate\Http\File;
+use Illuminate\Http\Request;
 use OpenApi\Annotations as OA;
 /**
  *  * @OA\Info(
@@ -90,5 +92,18 @@ class EmployeeController extends Controller
     public function update()
     {
         return $this->employeeService->update();
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:csv,txt|max:2048',
+        ]);
+
+        $file = $request->file('file');
+        
+        $symfonyFile = new File($file->getPathname());
+
+        return $this->employeeService->import($symfonyFile);
     }
 }
