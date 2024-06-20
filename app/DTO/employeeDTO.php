@@ -3,7 +3,7 @@
 namespace App\DTO;
 
 use App\Enums\ServiceType;
-use Illuminate\Support\Facades\Log;
+use App\Models\Division;
 
 class EmployeeDTO
 {
@@ -84,7 +84,7 @@ class EmployeeDTO
         $this->type = 1;
     }
 
-    private function convertDate(string $date) :string | null
+    private function convertDate(string $date): string | null
     {
         if ($date) {
             $date = \DateTime::createFromFormat('d.m.Y', $date);
@@ -93,7 +93,7 @@ class EmployeeDTO
         return null;
     }
 
-    private function convertPhone(string $phone):string|null
+    private function convertPhone(string $phone): string|null
     {
         $phone = preg_replace('/[^0-9]/', '', $phone);
         if (strlen($phone) != 10) {
@@ -104,7 +104,7 @@ class EmployeeDTO
         return $formattedPhone;
     }
 
-    private function convertPersonalId(string $personalId):string
+    private function convertPersonalId(string $personalId): string
     {
         while (strlen($personalId) < 9) {
             $personalId = "0" . $personalId;
@@ -120,13 +120,13 @@ class EmployeeDTO
         return $name;
     }
 
-    private function validateAndCorrectDivision(string $division): string|null
+    private function validateAndCorrectDivision(string $division): string
     {
-        foreach ($this->divisions as $div) {
-            if ($division === $div[1] || $division === $div[0]) {
-                return $div[0];
+        $invalidDivision = Division::where('invalid_name', $division)->first();
+        if ($invalidDivision) {
+                return $invalidDivision->name;
             }
-        }
-        return null;
+        
+        return $division;
     }
 }
