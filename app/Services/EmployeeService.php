@@ -6,8 +6,7 @@ use App\DTO\EmployeeDTO;
 use App\Models\Details;
 use App\Models\Employee;
 use App\Validators\EmployeeValidator;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
+use Illuminate\Http\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -32,7 +31,7 @@ class EmployeeService
 
     public function update()
     {
-        $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees+1.csv";
+        $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees.csv";
         $columnMapping = [
             'תז' => 'personal_id',
             'מספר אישי' => 'personal_number',
@@ -80,7 +79,8 @@ class EmployeeService
 
             DB::beginTransaction();
             try {
-                $employees = Employee::whereNotIn('personal_number', $csvPersonalNumbers)->get();
+                $employees = Employee::where('type', 1)
+                    ->whereNotIn('personal_number', $csvPersonalNumbers)->get();
                 foreach ($employees as $employee) {
                     $employee->details()->delete();
                     $employee->delete();
@@ -90,7 +90,10 @@ class EmployeeService
                 foreach ($employeeDTOs as $dto) {
                     $employee = Employee::withTrashed()->updateOrCreate(
                         ['personal_number' => $dto->personal_number],
-                        (array)$dto
+                        [
+                            'user_name' => $dto->user_name,
+                            'type' => $dto->type,
+                        ]
                     );
 
                     $dto->employee_id = $employee->id;
@@ -108,61 +111,61 @@ class EmployeeService
 
                 DB::commit();
 
-                return redirect()->back()->with('success', 'CSV file imported successfully.');
+                return response()->json(['message' => 'CSV file imported successfully']);
             } catch (\Exception $e) {
                 DB::rollBack();
 
-                return redirect()->back()->with('error', 'Error importing CSV file: ' . $e->getMessage());
+                return response()->json(['error' => 'Error importing CSV file: ' . $e->getMessage()], 500);
             }
         }
 
-        return redirect()->back()->with('error', 'File not found.');
+        return response()->json(['error' => 'File not found.'], 404);
     }
 
-    public function import(Request $request)
-{
-    // Validate the request to ensure a file is uploaded
-    $request->validate([
-        'file' => 'required|mimes:csv,txt|max:2048', // Adjust max file size as needed
-    ]);
+    public function import(File $file)
+    {
+        if ($file) {
+            try {
+                $fileContents = file($file->getPathname());
 
-    // Retrieve the uploaded file from the request
-    $file = $request->file('file');
+                $headers = str_getcsv(array_shift($fileContents));
 
-    // Check if file upload was successful
-    if ($file) {
-        try {
-            // Read file contents into an array of lines
-            $fileContents = file($file->getPathname());
+                $processedPersonalNumbers = [];
 
-            // Process each line in the CSV file
-            foreach ($fileContents as $line) {
-                // Parse CSV line into an array of data
-                $data = str_getcsv($line);
+                foreach ($fileContents as $line) {
+                    $data = str_getcsv($line);
 
-                // Update or create Employee based on personal_number
-                $employee = Employee::withTrashed()->updateOrCreate([
-                    'personal_number' => $data["personal_number"],
-                ], [
-                    'user_name' => $data["user_name"], // Update user_name if record exists
-                    // Add other fields to update or create as needed
-                ]);
+                    $rowData = array_combine($headers, $data);
 
-                // Restore the employee if it was soft deleted
-                if ($employee->trashed()) {
-                    $employee->restore();
+                    $employee = Employee::withTrashed()->updateOrCreate(
+                        [
+                            'personal_number' => $rowData["personal_number"],
+                            'type' => 2,
+                        ],
+                        [
+                            'user_name' => $rowData["user_name"],
+                            'type' => 2,
+                        ]
+                    );
+
+                    if ($employee->trashed()) {
+                        $employee->restore();
+                    }
+
+                    $processedPersonalNumbers[] = $rowData["personal_number"];
                 }
+
+                Employee::where('type', 2)
+                    ->whereNotIn('personal_number', $processedPersonalNumbers)
+                    ->delete();
+
+                return response()->json(['message' => 'CSV file imported successfully']);
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Error importing CSV file: ' . $e->getMessage()], 500);
             }
-
-            return redirect()->back()->with('success', 'CSV file imported successfully.');
-        } catch (\Exception $e) {
-            // Handle exceptions (e.g., file reading errors, database errors)
-            return redirect()->back()->with('error', 'Error importing CSV file: ' . $e->getMessage());
         }
+
+        return response()->json(['error' => 'No file uploaded.'], 400);
     }
-
-    // Handle case where no file was uploaded (though should be covered by validation)
-    return redirect()->back()->with('error', 'No file uploaded.');
 }
 
-}

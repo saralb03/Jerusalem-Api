@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('personal_number')->nullable()->unique();
             $table->string('user_name')->nullable()->unique();
+            $table->smallInteger('type')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
