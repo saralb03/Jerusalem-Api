@@ -14,12 +14,19 @@ class Employee extends Model
     protected $fillable = [
         'personal_number',
         'user_name',
+        'type',
     ];
 
     protected $hidden = [
         'created_at',
         'updated_at',
         'employee_id',
+        'type',
     ];
 
+    public function details()
+    {
+        return $this->hasOne(Details::class);
+    }
 }
+

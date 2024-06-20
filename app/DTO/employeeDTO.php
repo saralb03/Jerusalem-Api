@@ -30,6 +30,7 @@ class EmployeeDTO
     public $population_id;
     public $employee_id;
     public $user_name;
+    public $type;
 
     private $divisions = [
         ['אט"ל 700', 'אטל 700'], ['בסיס 128 לשכות', 'בסיס 128 לשכות'],
@@ -80,6 +81,7 @@ class EmployeeDTO
         $this->population_id = $data['population_id'];
         $this->phone_number = $this->convertPhone($data['phone_number']);
         $this->user_name = $data['user_name'];
+        $this->type = 1;
     }
 
     private function convertDate(string $date): string | null
