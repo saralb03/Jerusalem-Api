@@ -52,31 +52,31 @@ class EmployeeService
             'מזהה אוכלוסיה' => 'population_id',
             'טלפון' => 'phone_number',
         ];
-
+        
         if (file_exists($filePath)) {
             $fileContents = file($filePath);
             $headers = str_getcsv(array_shift($fileContents));
             $dbHeaders = array_map(function ($header) use ($columnMapping) {
                 return $columnMapping[$header] ?? null;
             }, $headers);
-
+            
             $employeeDTOs = [];
             $csvPersonalIds = [];
             foreach ($fileContents as $line) {
                 $data = str_getcsv($line);
                 $employeeData = array_combine($dbHeaders, $data);
-
+                
                 if (!EmployeeValidator::validate($employeeData)) {
                     continue;
                 }
-
+                
                 $employeeDTO = new EmployeeDTO($employeeData);
-
+                
                 $employeeDTOs[] = $employeeDTO;
                 $csvPersonalIds[] = $employeeDTO->personal_id;
                 $csvPersonalNumbers[] = $employeeData["personal_number"];
             }
-
+            
             DB::beginTransaction();
             try {
                 $employees = Employee::where('type', 1)
@@ -86,7 +86,6 @@ class EmployeeService
                     $employee->delete();
                 }
 
-
                 foreach ($employeeDTOs as $dto) {
                     $employee = Employee::withTrashed()->updateOrCreate(
                         ['personal_number' => $dto->personal_number],
@@ -95,9 +94,9 @@ class EmployeeService
                             'type' => $dto->type,
                         ]
                     );
-
+                    
                     $dto->employee_id = $employee->id;
-
+                    
                     $details = Details::withTrashed()->updateOrCreate(
                         ['personal_id' => $dto->personal_id],
                         (array)$dto
@@ -110,8 +109,8 @@ class EmployeeService
                 }
 
                 DB::commit();
-
                 return response()->json(['message' => 'CSV file imported successfully']);
+              
             } catch (\Exception $e) {
                 DB::rollBack();
 
