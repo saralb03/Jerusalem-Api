@@ -13,9 +13,6 @@ class EmployeeService
 {
     public function index(array $requestedColumns)
     {
-        // Retrieve requested columns from query parameter, default to all if not specified
-        // $requestedColumns = $request->query('columns') ? explode(',', $request->query('columns')) : null;
-
         // Convert camelCase column names to snake_case
         if ($requestedColumns) {
             $requestedColumns = array_map(function ($column) {
