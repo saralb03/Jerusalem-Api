@@ -94,6 +94,48 @@ class EmployeeController extends Controller
         return response()->json($employees, Response::HTTP_OK);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/employees/import",
+     *     summary="Import employees from a CSV file",
+     *     tags={"Employees"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="file",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="CSV file to be uploaded"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="CSV file imported successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="CSV file imported successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="404",
+     *         description="No file uploaded",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No file uploaded.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="500",
+     *         description="Error importing CSV file",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Error importing CSV file: [error message]")
+     *         )
+     *     )
+     * )
+     */
     public function import(Request $request): JsonResponse
     {
         $request->validate([
