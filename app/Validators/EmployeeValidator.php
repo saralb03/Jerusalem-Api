@@ -2,22 +2,18 @@
 
 namespace App\Validators;
 
+use App\Enums\Division;
 use Illuminate\Support\Facades\Validator;
 use App\Enums\ServiceType;
-use App\Models\Division;
 use Illuminate\Validation\Rule;
 
 class EmployeeValidator
 {
     public static function validate(array $dto)
     {
-        $divisionNames = Division::pluck('name')
-            ->merge(Division::pluck('invalid_name'))->toArray();
-
-            
         $validator = Validator::make($dto, [
             'personal_id' => 'required|string|max:9|regex:/^\d+$/',
-            'personal_number' => 'required|integer|digits:7|regex:/^\d+$/',
+            'personal_number' => 'required|integer|digits:7',
             'ranks' => 'required|string',
             'surname' => 'required|string',
             'first_name' => 'required|string',
@@ -27,12 +23,12 @@ class EmployeeValidator
             'division' => [
                 'required',
                 'string',
-                Rule::in($divisionNames),
+                Rule::in(Division::cases()),
             ],
             'service_type' => [
                 'required',
                 'string',
-                Rule::in(array_column(ServiceType::cases(), 'value'))
+                Rule::in(ServiceType::cases()),
             ],
             'date_of_birth' => 'required|date_format:d.m.Y',
             'service_type_code' => 'required|integer',

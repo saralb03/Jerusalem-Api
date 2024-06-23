@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Status;
 use App\Http\Requests\IndexEmployeeRequest;
 use App\Services\EmployeeService;
 use Illuminate\Http\File;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  *  * @OA\Info(
  *     title="Employee API",
@@ -53,7 +57,7 @@ class EmployeeController extends Controller
     }
 
     // public function __construct(public readonly EmployeeService $employeeService) { }
-    
+
     /**
      * @OA\Get(
      *     path="/api/employees",
@@ -85,27 +89,41 @@ class EmployeeController extends Controller
      *     )
      * )
      */
-    public function index(IndexEmployeeRequest $request)
+    public function index(IndexEmployeeRequest $request): JsonResponse
     {
         $requestedColumns = $request->query('columns') ? explode(',', $request->query('columns')) : [];
-        return $this->employeeService->index($requestedColumns);
+        $employees =  $this->employeeService->index($requestedColumns);
+        return response()->json($employees, Response::HTTP_OK);
     }
 
-    public function update()
+
+    public function update(): JsonResponse
     {
-        return $this->employeeService->update();
+        $result = $this->employeeService->update();
+
+        return match ($result) {
+            Status::NOT_FOUND => response()->json(['error' => 'File not found.'], Response::HTTP_NOT_FOUND),
+            Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),
+            default => response()->json(['error' => 'Error importing CSV file: ' . $result], Response::HTTP_INTERNAL_SERVER_ERROR),
+        };
     }
 
-    public function import(Request $request)
+
+    public function import(Request $request): JsonResponse
     {
         $request->validate([
             'file' => 'required|mimes:csv,txt|max:2048',
         ]);
 
         $file = $request->file('file');
-        
+
         $symfonyFile = new File($file->getPathname());
 
-        return $this->employeeService->import($symfonyFile);
+        $result = $this->employeeService->import($symfonyFile);
+        return match ($result) {
+            Status::NOT_FOUND => response()->json(['error' => 'No file uploaded.'], Response::HTTP_NOT_FOUND),
+            Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),
+            default => response()->json(['error' => 'Error importing CSV file: ' . $result], Response::HTTP_INTERNAL_SERVER_ERROR),
+        };
     }
 }

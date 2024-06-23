@@ -2,8 +2,8 @@
 
 namespace App\DTO;
 
+use App\Enums\ClassificationName;
 use App\Enums\ServiceType;
-use App\Models\Division;
 
 class EmployeeDTO
 {
@@ -11,8 +11,8 @@ class EmployeeDTO
     public $personal_number;
     public $prefix;
     public $ranks;
-    public $surname;
     public $first_name;
+    public $surname;
     public $department;
     public $branch;
     public $section;
@@ -34,47 +34,44 @@ class EmployeeDTO
 
     public function __construct(array $data)
     {
-        // enum
-        $classification_names = [
-            1 => 'שו"ס',
-            2 => 'סודי ביותר קהילה',
-            3 => 'סודי ביותר',
-            4 => 'סודי',
-            5 => 'שמור',
-        ];
-
-        match ($data['service_type']) {
-            ServiceType::MISSION_CIVILAN->value => $prefix = 'C',
-            ServiceType::DUTY->value, ServiceType::DUTY_REGULARITY->value,
-            ServiceType::DISCHARGE->value, ServiceType::REGULARITY->value => $prefix = 'S',
-            ServiceType::RESERVES, ServiceType::VOLUNTERR_RESERVES->value => $prefix = 'M',
-            default => $prefix = '',
-        };
-        
-        $this->personal_id = $this->convertPersonalId($data['personal_id']);
+        $this->personal_id = $data['personal_id'];
         $this->personal_number = $data['personal_number'];
-        $this->prefix = $prefix;
         $this->ranks = $data['ranks'];
-        $this->surname = $this->convertName($data['surname']);
-        $this->first_name = $this->convertName($data['first_name']);
-        $this->department = $data['department'] != "" ? $data['department']: null;
-        $this->branch = $data['branch']!= "" ? $data['branch']: null;
-        $this->section = $data['section']!= "" ? $data['section']: null;
-        $this->division = $this->validateAndCorrectDivision($data['division']);
+        $this->first_name = $data['first_name'];
+        $this->surname = $data['surname'];
+        $this->department = $data['department'] != "" ? $data['department'] : null;
+        $this->branch = $data['branch'] != "" ? $data['branch'] : null;
+        $this->section = $data['section'] != "" ? $data['section'] : null;
+        $this->division = $data['division'];
         $this->service_type = $data['service_type'];
-        $this->date_of_birth = $this->convertDate($data['date_of_birth']);
+        $this->date_of_birth = $data['date_of_birth'];
         $this->service_type_code = $data['service_type_code'];
-        $this->security_class_start_date = $this->convertDate($data['security_class_start_date']);
-        $this->service_start_date = $this->convertDate($data['service_start_date']);
+        $this->security_class_start_date = $data['security_class_start_date'];
+        $this->service_start_date = $data['service_start_date'];
         $this->solider_type = $data['solider_type'];
         $this->age = $data['age'];
         $this->classification = $data['classification'];
-        $this->classification_name = $classification_names[$data['classification']];
         $this->population_id = $data['population_id'];
-        $this->phone_number = $this->convertPhone($data['phone_number']);
+        $this->phone_number = $data['phone_number'];
         $this->user_name = $data['user_name'];
-        $this->type = 1; // enums
+        $this->type = 1;
     }
+
+
+    private function convertPersonalId(string $personalId): string
+    {
+        return str_pad($personalId, 9, '0', STR_PAD_LEFT);
+    }
+
+
+    private function convertName(string $name): string
+    {
+        $name = str_replace(['-', '_'], ' ', $name);
+        $name = preg_replace('/[^\p{Hebrew}\s]/u', '', $name);
+
+        return $name;
+    }
+
 
     private function convertDate(string $date): string | null
     {
@@ -85,42 +82,34 @@ class EmployeeDTO
         return null;
     }
 
+
     private function convertPhone(string $phone): string|null
     {
         $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        if (strlen($phone) == 9 && $phone[0] !== '0') {
+            $phone = '0' . $phone;
+        }
 
         if (strlen($phone) != 10) {
             return null;
         }
 
         return substr($phone, 0, 3) . '-' . substr($phone, 3);
-        // return $formattedPhone;
     }
 
-    // can use padding left instead of the while loop
-    private function convertPersonalId(string $personalId): string
-    {
-        while (strlen($personalId) < 9) {
-            $personalId = "0" . $personalId;
-        }
-        return $personalId;
-    }
 
-    private function convertName(string $name): string
+    public function convertDTO()
     {
-        $name = str_replace(['-', '_'], ' ', $name);
-        $name = preg_replace('/[^\p{Hebrew}\s]/u', '', $name);
+        $this->personal_id = $this->convertPersonalId($this->personal_id);
+        $this->prefix = ServiceType::from($this->service_type)->getPrefix();
+        $this->first_name = $this->convertName($this->first_name);
+        $this->surname = $this->convertName($this->surname);
+        $this->date_of_birth = $this->convertDate($this->date_of_birth);
+        $this->security_class_start_date = $this->convertDate($this->security_class_start_date);
+        $this->service_start_date = $this->convertDate($this->service_start_date);
+        $this->classification_name = ClassificationName::toHebrew($this->classification);
+        $this->phone_number = $this->convertPhone($this->phone_number);
 
-        return $name;
-    }
-
-    private function validateAndCorrectDivision(string $division): string
-    {
-        $invalidDivision = Division::where('invalid_name', $division)->first();
-        if ($invalidDivision) {
-            return $invalidDivision->name;
-        }
-        
-        return $division;
     }
 }
