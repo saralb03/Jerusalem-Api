@@ -20,18 +20,22 @@ class EmployeeService
             }, $requestedColumns);
         }
 
+
+        // maybe use When instead
+        
         $employees = $requestedColumns
             ? Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
             ->select($requestedColumns)
             ->get()
             : Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
             ->get();
+
         return response()->json($employees);
     }
 
     public function update()
     {
-        $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees.csv";
+        $filePath = "C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv";
         $columnMapping = [
             'תז' => 'personal_id',
             'מספר אישי' => 'personal_number',
@@ -40,6 +44,8 @@ class EmployeeService
             'שם פרטי' => 'first_name',
             'שם משתמש' => 'user_name',
             'מחלקה' => 'department',
+            'ענף' => 'branch',
+            'מדור' => 'section',
             'יחידה' => 'division',
             'סוג שרות' => 'service_type',
             'תאריך לידה' => 'date_of_birth',
@@ -52,16 +58,16 @@ class EmployeeService
             'מזהה אוכלוסיה' => 'population_id',
             'טלפון' => 'phone_number',
         ];
-        
+
         if (file_exists($filePath)) {
             $fileContents = file($filePath);
             $headers = str_getcsv(array_shift($fileContents));
             $dbHeaders = array_map(function ($header) use ($columnMapping) {
                 return $columnMapping[$header] ?? null;
             }, $headers);
-            
             $employeeDTOs = [];
             $csvPersonalIds = [];
+
             foreach ($fileContents as $line) {
                 $data = str_getcsv($line);
                 $employeeData = array_combine($dbHeaders, $data);
@@ -71,7 +77,7 @@ class EmployeeService
                 }
                 
                 $employeeDTO = new EmployeeDTO($employeeData);
-                
+
                 $employeeDTOs[] = $employeeDTO;
                 $csvPersonalIds[] = $employeeDTO->personal_id;
                 $csvPersonalNumbers[] = $employeeData["personal_number"];
@@ -79,7 +85,8 @@ class EmployeeService
             
             DB::beginTransaction();
             try {
-                $employees = Employee::where('type', 1)
+                $employees = Employee::with('details')
+                    ->where('type', 1)
                     ->whereNotIn('personal_number', $csvPersonalNumbers)->get();
                 foreach ($employees as $employee) {
                     $employee->details()->delete();
@@ -96,7 +103,6 @@ class EmployeeService
                     );
                     
                     $dto->employee_id = $employee->id;
-                    
                     $details = Details::withTrashed()->updateOrCreate(
                         ['personal_id' => $dto->personal_id],
                         (array)$dto
@@ -110,10 +116,8 @@ class EmployeeService
 
                 DB::commit();
                 return response()->json(['message' => 'CSV file imported successfully']);
-              
             } catch (\Exception $e) {
                 DB::rollBack();
-
                 return response()->json(['error' => 'Error importing CSV file: ' . $e->getMessage()], 500);
             }
         }
@@ -139,11 +143,11 @@ class EmployeeService
                     $employee = Employee::withTrashed()->updateOrCreate(
                         [
                             'personal_number' => $rowData["personal_number"],
-                            'type' => 2,
+                            'type' => 2, // enums
                         ],
                         [
                             'user_name' => $rowData["user_name"],
-                            'type' => 2,
+                            'type' => 2, // enums
                         ]
                     );
 
