@@ -52,6 +52,8 @@ class EmployeeController extends Controller
         $this->employeeService = $employeeService;
     }
 
+    // public function __construct(public readonly EmployeeService $employeeService) { }
+    
     /**
      * @OA\Get(
      *     path="/api/employees",
