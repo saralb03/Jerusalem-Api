@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\DTO\EmployeeDTO;
 use App\Enums\Status;
+use App\Enums\EmployeeType;
+use App\Enums\ValidColumns;
 use App\Models\Details;
 use App\Models\Employee;
 use App\Validators\EmployeeValidator;
@@ -16,15 +18,17 @@ class EmployeeService
 {
     public function index(array $requestedColumns): Collection
     {
-        if ($requestedColumns) {
-            $requestedColumns = array_map(function ($column) {
-                return Str::snake($column);
-            }, $requestedColumns);
+        $validColumns = [];
+        foreach ($requestedColumns as $column) {
+            if (!ValidColumns::isValidColumn($column)) {
+                continue;
+            }
+            $validColumns[] = ValidColumns::from($column)->toSnake();
         }
-
+      
         $employees = Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
-            ->when($requestedColumns, function ($query, $columns) {
-                return $query->select($columns);
+            ->when($validColumns, function ($query) use ($validColumns) {
+                $query->select($validColumns);
             })
             ->get();
 
@@ -33,7 +37,9 @@ class EmployeeService
 
     public function update(): Status | string
     {
-        $filePath = "C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv";
+        // $filePath = "C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv";
+        $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees-2.csv";
+      
         $columnMapping = [
             'תז' => 'personal_id',
             'מספר אישי' => 'personal_number',
@@ -129,44 +135,34 @@ class EmployeeService
         if (!$file) {
             return Status::NOT_FOUND;
         }
-
         try {
             $fileContents = file($file->getPathname());
-
             $headers = str_getcsv(array_shift($fileContents));
-
             $processedPersonalNumbers = [];
-
             foreach ($fileContents as $line) {
                 $data = str_getcsv($line);
-
                 $rowData = array_combine($headers, $data);
-
                 $employee = Employee::withTrashed()->updateOrCreate(
                     [
                         'personal_number' => $rowData["personal_number"],
-                        'type' => 2, // enums
+                        'type' => EmployeeType::NOT_REQULAR->value,
                     ],
                     [
                         'user_name' => $rowData["user_name"],
-                        'type' => 2, // enums
+                        'type' => EmployeeType::NOT_REQULAR->value,
                     ]
                 );
-
                 if ($employee->trashed()) {
                     $employee->restore();
                 }
-
                 $processedPersonalNumbers[] = $rowData["personal_number"];
             }
-
-            Employee::where('type', 2)
+            Employee::where('type', EmployeeType::NOT_REQULAR->value)
                 ->whereNotIn('personal_number', $processedPersonalNumbers)
                 ->delete();
-
-            return Status::OK;
+            return return Status::OK;
         } catch (\Exception $e) {
-            return $e->getMessage();
+            return return $e->getMessage();
         }
     }
 }

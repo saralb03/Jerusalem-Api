@@ -3,6 +3,7 @@
 namespace App\DTO;
 
 use App\Enums\ClassificationName;
+use App\Enums\EmployeeType;
 use App\Enums\ServiceType;
 
 class EmployeeDTO
@@ -54,7 +55,7 @@ class EmployeeDTO
         $this->population_id = $data['population_id'];
         $this->phone_number = $data['phone_number'];
         $this->user_name = $data['user_name'];
-        $this->type = 1;
+        $this->type = EmployeeType::REQULAR;
     }
 
 
