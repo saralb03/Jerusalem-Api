@@ -14,9 +14,9 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // User::factory()->count(5)->create();
-        $adminUser = User::create(['personal_number' => 1111111]);
+        $adminUser = User::create(['personal_number' => 1111111, 'user_name' => 'Hadas']);
         $adminUser->assignRole('admin');
-        $adminUser2 = User::create(['personal_number' => 2222222]);
+        $adminUser2 = User::create(['personal_number' => 2222222, 'user_name' => 'Sara']);
         $adminUser2->assignRole('admin');
     }
 }

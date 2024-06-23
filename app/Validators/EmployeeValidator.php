@@ -14,6 +14,7 @@ class EmployeeValidator
         $divisionNames = Division::pluck('name')
             ->merge(Division::pluck('invalid_name'))->toArray();
 
+            
         $validator = Validator::make($dto, [
             'personal_id' => 'required|string|max:9|regex:/^\d+$/',
             'personal_number' => 'required|integer|digits:7|regex:/^\d+$/',
@@ -26,7 +27,7 @@ class EmployeeValidator
             'division' => [
                 'required',
                 'string',
-                Rule::exists($divisionNames),
+                Rule::in($divisionNames),
             ],
             'service_type' => [
                 'required',
