@@ -144,11 +144,11 @@ class EmployeeService
                 $employee = Employee::withTrashed()->updateOrCreate(
                     [
                         'personal_number' => $rowData["personal_number"],
-                        'type' => EmployeeType::NOT_REQULAR->value,
+                        'type' => EmployeeType::NOT_REGULAR->value,
                     ],
                     [
                         'user_name' => $rowData["user_name"],
-                        'type' => EmployeeType::NOT_REQULAR->value,
+                        'type' => EmployeeType::NOT_REGULAR->value,
                     ]
                 );
                 if ($employee->trashed()) {
@@ -156,7 +156,7 @@ class EmployeeService
                 }
                 $processedPersonalNumbers[] = $rowData["personal_number"];
             }
-            Employee::where('type', EmployeeType::NOT_REQULAR->value)
+            Employee::where('type', EmployeeType::NOT_REGULAR->value)
                 ->whereNotIn('personal_number', $processedPersonalNumbers)
                 ->delete();
             return Status::OK;

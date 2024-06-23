@@ -94,19 +94,6 @@ class EmployeeController extends Controller
         return response()->json($employees, Response::HTTP_OK);
     }
 
-
-    public function update(): JsonResponse
-    {
-        $result = $this->employeeService->update();
-
-        return match ($result) {
-            Status::NOT_FOUND => response()->json(['error' => 'File not found.'], Response::HTTP_NOT_FOUND),
-            Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),
-            default => response()->json(['error' => 'Error importing CSV file: ' . $result], Response::HTTP_INTERNAL_SERVER_ERROR),
-        };
-    }
-
-
     public function import(Request $request): JsonResponse
     {
         $request->validate([
@@ -115,9 +102,9 @@ class EmployeeController extends Controller
 
         $file = $request->file('file');
 
-        $symfonyFile = new File($file->getPathname());
+        $extractedFile = new File($file->getPathname());
 
-        $result = $this->employeeService->import($symfonyFile);
+        $result = $this->employeeService->import($extractedFile);
         return match ($result) {
             Status::NOT_FOUND => response()->json(['error' => 'No file uploaded.'], Response::HTTP_NOT_FOUND),
             Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),
