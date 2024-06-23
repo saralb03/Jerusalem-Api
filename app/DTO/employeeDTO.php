@@ -2,6 +2,7 @@
 
 namespace App\DTO;
 
+use App\Enums\EmployeeType;
 use App\Enums\ServiceType;
 use App\Models\Division;
 
@@ -34,7 +35,6 @@ class EmployeeDTO
 
     public function __construct(array $data)
     {
-        // enum
         $classification_names = [
             1 => 'שו"ס',
             2 => 'סודי ביותר קהילה',
@@ -73,7 +73,7 @@ class EmployeeDTO
         $this->population_id = $data['population_id'];
         $this->phone_number = $this->convertPhone($data['phone_number']);
         $this->user_name = $data['user_name'];
-        $this->type = 1; // enums
+        $this->type = EmployeeType::REQULAR;
     }
 
     private function convertDate(string $date): string | null
@@ -94,7 +94,6 @@ class EmployeeDTO
         }
 
         return substr($phone, 0, 3) . '-' . substr($phone, 3);
-        // return $formattedPhone;
     }
 
     // can use padding left instead of the while loop
