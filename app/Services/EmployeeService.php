@@ -38,7 +38,7 @@ class EmployeeService
     public function update(): Status | string
     {
         // $filePath = "C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv";
-        $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees-2.csv";
+        $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees+1.csv";
       
         $columnMapping = [
             'תז' => 'personal_id',
@@ -160,9 +160,9 @@ class EmployeeService
             Employee::where('type', EmployeeType::NOT_REQULAR->value)
                 ->whereNotIn('personal_number', $processedPersonalNumbers)
                 ->delete();
-            return return Status::OK;
+            return Status::OK;
         } catch (\Exception $e) {
-            return return $e->getMessage();
+            return $e->getMessage();
         }
     }
 }
