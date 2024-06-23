@@ -78,10 +78,6 @@
                     "deleted_at"
                 ],
                 "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
                     "personal_id": {
                         "type": "string",
                         "example": "209959501"
@@ -160,11 +156,6 @@
                     "phone_number": {
                         "type": "string",
                         "example": "055-9254116"
-                    },
-                    "deleted_at": {
-                        "type": "string",
-                        "example": null,
-                        "nullable": true
                     }
                 },
                 "type": "object"
