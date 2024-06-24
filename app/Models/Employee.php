@@ -19,6 +19,7 @@ class Employee extends Model
     ];
 
     protected $hidden = [
+        'id',
         'created_at',
         'updated_at',
         'employee_id',

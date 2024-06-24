@@ -43,7 +43,6 @@ use Symfony\Component\HttpFoundation\Response;
  *     @OA\Property(property="classification_name", type="string", example="סודי"),
  *     @OA\Property(property="population_id", type="integer", example=1),
  *     @OA\Property(property="phone_number", type="string", example="055-9254116"),
- *     @OA\Property(property="deleted_at", type="string", nullable=true, example=null),
  * )
  */
 class EmployeeController extends Controller
@@ -95,7 +94,49 @@ class EmployeeController extends Controller
         return response()->json($employees, Response::HTTP_OK);
     }
 
-
+  
+    /**
+     * @OA\Post(
+     *     path="/api/employees/import",
+     *     summary="Import employees from a CSV file",
+     *     tags={"Employees"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="file",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="CSV file to be uploaded"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="CSV file imported successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="CSV file imported successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="404",
+     *         description="No file uploaded",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No file uploaded.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="500",
+     *         description="Error importing CSV file",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Error importing CSV file: [error message]")
+     *         )
+     *     )
+     * )
+     */
     public function import(Request $request): JsonResponse
     {
         $request->validate([
@@ -103,10 +144,10 @@ class EmployeeController extends Controller
         ]);
 
         $file = $request->file('file');
+        $extractedFile = new File($file->getPathname());
+      
+        $result = $this->employeeService->import($extractedFile);
 
-        $extractFile = new File($file->getPathname());
-
-        $result = $this->employeeService->import($extractFile);
         return match ($result) {
             Status::NOT_FOUND => response()->json(['error' => 'No file uploaded.'], Response::HTTP_NOT_FOUND),
             Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),

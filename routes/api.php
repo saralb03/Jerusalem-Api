@@ -31,6 +31,5 @@ Route::controller(EmployeeController::class)
     ->middleware(['verify.cookie', 'auth:api', 'role:admin'])
     ->group(function () {
         Route::get('/', 'index');
-        Route::get('/update', 'update');
         Route::post('/import', 'import');
     });
