@@ -10,7 +10,7 @@ enum ClassificationName: int
     case SECRET = 4;
     case RESERVED = 5;
 
-    public static function toHebrew(int $classification): string {
+    public static function toHebrew(int $classification): ?string {
         switch ($classification) {
             case self::SHOS->value:
                 return 'שו"ס';
@@ -23,7 +23,7 @@ enum ClassificationName: int
             case self::RESERVED->value:
                 return 'שמור';
             default:
-                return 'Unknown'; // or handle invalid classification
+                return null; // or handle invalid classification
         }
     }
 }

@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
  * )
  * @OA\Schema(
  *     schema="Employee",
- *     required={"id", "personal_id", "personal_number", "ranks", "surname", "first_name", "department", "division", "service_type", "date_of_birth", "service_type_code", "security_class_start_date", "service_start_date", "solider_type", "age", "classification", "classification_name", "phone_number", "deleted_at"},
+ *     required={"personal_id", "personal_number", "ranks", "surname", "first_name", "department", "division", "service_type", "date_of_birth", "service_type_code", "security_class_start_date", "service_start_date", "solider_type", "age", "classification", "classification_name", "phone_number", "deleted_at"},
  *     @OA\Property(property="personal_id", type="string", example="209959501"),
  *     @OA\Property(property="personal_number", type="string", example="5252568"),
  *     @OA\Property(property="prefix", type="string", example="S"),

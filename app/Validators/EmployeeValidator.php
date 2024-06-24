@@ -36,7 +36,7 @@ class EmployeeValidator
             'service_start_date' => 'required|date_format:d.m.Y',
             'solider_type' => 'required|string',
             'age' => 'required|integer',
-            'classification' => 'required|integer',
+            'classification' => 'required|integer|min:1|max:5',
             'phone_number' => 'nullable',
             'population_id' => 'required|integer'
         ]);
