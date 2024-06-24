@@ -12,7 +12,7 @@ enum ServiceType: string
     case RESERVES = 'מלואים';
     case VOLUNTERR_RESERVES = 'מלואים מתנדבים';
 
-    public function getPrefix(): string
+    public function getPrefix(): ?string
     {
         switch ($this) {
             case self::MISSION_CIVILAN:
@@ -26,7 +26,7 @@ enum ServiceType: string
             case self::VOLUNTERR_RESERVES:
                 return 'M';
             default:
-                return '';
+                return null;
         }
     }
 }

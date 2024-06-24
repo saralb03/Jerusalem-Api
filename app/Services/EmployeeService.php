@@ -26,6 +26,7 @@ class EmployeeService
         }
       
         $employees = Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
+        // ->leftJoin('details', 'population.identifier', '=', 'details.population_id')
             ->when($validColumns, function ($query) use ($validColumns) {
                 $query->select($validColumns);
             })
@@ -96,6 +97,7 @@ class EmployeeService
             $employees = Employee::with('details')
                 ->where('type', 1)
                 ->whereNotIn('personal_number', $csvPersonalNumbers)->get();
+
             foreach ($employees as $employee) {
                 $employee->details()->delete();
                 $employee->delete();
@@ -136,10 +138,12 @@ class EmployeeService
         if (!$file) {
             return Status::NOT_FOUND;
         }
+
         try {
             $fileContents = file($file->getPathname());
             $headers = str_getcsv(array_shift($fileContents));
             $processedPersonalNumbers = [];
+
             foreach ($fileContents as $line) {
                 $data = str_getcsv($line);
                 $rowData = array_combine($headers, $data);
@@ -153,14 +157,17 @@ class EmployeeService
                         'type' => EmployeeType::NOT_REGULAR->value,
                     ]
                 );
+
                 if ($employee->trashed()) {
                     $employee->restore();
                 }
                 $processedPersonalNumbers[] = $rowData["personal_number"];
             }
+
             Employee::where('type', EmployeeType::NOT_REGULAR->value)
                 ->whereNotIn('personal_number', $processedPersonalNumbers)
                 ->delete();
+
             return Status::OK;
         } catch (\Exception $e) {
             return $e->getMessage();

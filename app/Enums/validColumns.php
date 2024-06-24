@@ -20,13 +20,13 @@ enum ValidColumns: string
     case TYPE = 'type';
     case DATE_OF_BIRTH = 'dateOfBirth';
     case SECURITY_CLASS_START_DATE = 'securityClassStartDate';
-    case SERVICE_START_DATE = 'service_start_date';
+    case SERVICE_START_DATE = 'serviceStartDate';
     case SOLIDER_TYPE = 'soliderType';
     case AGE = 'age';
     case CLASSIFICATION = 'classification';
     case CLASSIFICATION_NAME = 'classificationName';
-    case PHONE_NUMBER = 'phone_number';
-    case POPULATION_ID = 'population_id';
+    case PHONE_NUMBER = 'phoneNumber';
+    case POPULATION_ID = 'populationId';
 
     public function toSnake(): string
     {
