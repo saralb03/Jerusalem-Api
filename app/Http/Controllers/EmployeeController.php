@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\Response;
  * @OA\Schema(
  *     schema="Employee",
  *     required={"id", "personal_id", "personal_number", "ranks", "surname", "first_name", "department", "division", "service_type", "date_of_birth", "service_type_code", "security_class_start_date", "service_start_date", "solider_type", "age", "classification", "classification_name", "phone_number", "deleted_at"},
- *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="personal_id", type="string", example="209959501"),
  *     @OA\Property(property="personal_number", type="string", example="5252568"),
  *     @OA\Property(property="prefix", type="string", example="S"),
@@ -68,7 +67,7 @@ class EmployeeController extends Controller
      *         in="query",
      *         description="Comma-separated list of columns to retrieve",
      *         required=false,
-     *         example="id,personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at",
+     *         example="personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at",
      *         @OA\Schema(type="string")
      *     ),
      *     @OA\Response(
@@ -97,18 +96,6 @@ class EmployeeController extends Controller
     }
 
 
-    public function update(): JsonResponse
-    {
-        $result = $this->employeeService->update();
-
-        return match ($result) {
-            Status::NOT_FOUND => response()->json(['error' => 'File not found.'], Response::HTTP_NOT_FOUND),
-            Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),
-            default => response()->json(['error' => 'Error importing CSV file: ' . $result], Response::HTTP_INTERNAL_SERVER_ERROR),
-        };
-    }
-
-
     public function import(Request $request): JsonResponse
     {
         $request->validate([
@@ -117,9 +104,9 @@ class EmployeeController extends Controller
 
         $file = $request->file('file');
 
-        $symfonyFile = new File($file->getPathname());
+        $extractFile = new File($file->getPathname());
 
-        $result = $this->employeeService->import($symfonyFile);
+        $result = $this->employeeService->import($extractFile);
         return match ($result) {
             Status::NOT_FOUND => response()->json(['error' => 'No file uploaded.'], Response::HTTP_NOT_FOUND),
             Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),

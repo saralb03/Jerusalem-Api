@@ -12,7 +12,6 @@ use App\Validators\EmployeeValidator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class EmployeeService
 {
@@ -37,8 +36,8 @@ class EmployeeService
 
     public function update(): Status | string
     {
-        // $filePath = "C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv";
-        $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees-2.csv";
+        $filePath = "C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv";
+        // $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees-2.csv";
       
         $columnMapping = [
             'תז' => 'personal_id',
@@ -145,11 +144,11 @@ class EmployeeService
                 $employee = Employee::withTrashed()->updateOrCreate(
                     [
                         'personal_number' => $rowData["personal_number"],
-                        'type' => EmployeeType::NOT_REQULAR->value,
+                        'type' => EmployeeType::NOT_REGULAR->value,
                     ],
                     [
                         'user_name' => $rowData["user_name"],
-                        'type' => EmployeeType::NOT_REQULAR->value,
+                        'type' => EmployeeType::NOT_REGULAR->value,
                     ]
                 );
                 if ($employee->trashed()) {
@@ -157,12 +156,12 @@ class EmployeeService
                 }
                 $processedPersonalNumbers[] = $rowData["personal_number"];
             }
-            Employee::where('type', EmployeeType::NOT_REQULAR->value)
+            Employee::where('type', EmployeeType::NOT_REGULAR->value)
                 ->whereNotIn('personal_number', $processedPersonalNumbers)
                 ->delete();
-            return return Status::OK;
+            return Status::OK;
         } catch (\Exception $e) {
-            return return $e->getMessage();
+            return $e->getMessage();
         }
     }
 }
