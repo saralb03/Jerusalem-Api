@@ -66,7 +66,7 @@ class EmployeeController extends Controller
      *         in="query",
      *         description="Comma-separated list of columns to retrieve",
      *         required=false,
-     *         example="id,personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at",
+     *         example="personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at",
      *         @OA\Schema(type="string")
      *     ),
      *     @OA\Response(
@@ -94,6 +94,7 @@ class EmployeeController extends Controller
         return response()->json($employees, Response::HTTP_OK);
     }
 
+  
     /**
      * @OA\Post(
      *     path="/api/employees/import",
@@ -143,10 +144,10 @@ class EmployeeController extends Controller
         ]);
 
         $file = $request->file('file');
-
         $extractedFile = new File($file->getPathname());
-
+      
         $result = $this->employeeService->import($extractedFile);
+
         return match ($result) {
             Status::NOT_FOUND => response()->json(['error' => 'No file uploaded.'], Response::HTTP_NOT_FOUND),
             Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),

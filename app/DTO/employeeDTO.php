@@ -74,7 +74,7 @@ class EmployeeDTO
     }
 
 
-    private function convertDate(string $date): string | null
+    private function convertDate(string $date): ?string
     {
         if ($date) {
             $date = \DateTime::createFromFormat('d.m.Y', $date);
@@ -84,7 +84,7 @@ class EmployeeDTO
     }
 
 
-    private function convertPhone(string $phone): string|null
+    private function convertPhone(string $phone): ?string
     {
         $phone = preg_replace('/[^0-9]/', '', $phone);
 
@@ -100,7 +100,7 @@ class EmployeeDTO
     }
 
 
-    public function convertDTO()
+    public function convertDTO():void
     {
         $this->personal_id = $this->convertPersonalId($this->personal_id);
         $this->prefix = ServiceType::from($this->service_type)->getPrefix();
