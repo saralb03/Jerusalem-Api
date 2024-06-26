@@ -1,12 +1,10 @@
 <?php
 
 namespace App\Validators;
-
 use App\Enums\Division;
 use Illuminate\Support\Facades\Validator;
 use App\Enums\Population;
 use Illuminate\Validation\Rule;
-
 class EmployeeValidator
 {
     public static function validate(array $dto)

@@ -1,10 +1,7 @@
 <?php
-
 namespace App\DTO;
-
 use App\Enums\ClassificationName;
 use App\Enums\Population;
-
 class EmployeeDTO
 {
     public $personal_id;
@@ -31,7 +28,6 @@ class EmployeeDTO
     public $country_of_birth;
     public $release_date;
     public $employee_id;
-
     public function __construct(array $data)
     {
         $this->personal_id = $data['תז'] ?? $data['ת"ז'];
@@ -55,7 +51,7 @@ class EmployeeDTO
         $this->country_of_birth = $data['ארץ לידה'] ?? null;
         $this->release_date = $data['תאריך שחרור'];
     }
-
+    
 
     private function convertPersonalNumber(): void
     {
@@ -64,16 +60,13 @@ class EmployeeDTO
             $this->personal_number =  substr($this->personal_number, $length - 9, 7);
         }
     }
-
-
     private function convertName(string $name): string
     {
         $name = str_replace(['-', '_'], ' ', $name);
         $name = preg_replace('/[^\p{Hebrew}\s]/u', '', $name);
-
         return $name;
     }
-
+    
 
     private function convertDate($date): ?string
     {
@@ -83,12 +76,11 @@ class EmployeeDTO
         }
         return null;
     }
-
+    
 
     private function convertPhone(): void
     {
         $phone = preg_replace('/[^0-9]/', '', $this->phone_number);
-
         if (strlen($phone) == 9 && $phone[0] !== '0') {
             $this->phone_number = '0' . $phone;
         } else if (strlen($phone) != 10) {
@@ -97,7 +89,8 @@ class EmployeeDTO
             $this->phone_number = substr($phone, 0, 3) . '-' . substr($phone, 3);
         }
     }
-
+    
+    
     public function convertDTO(): void
     {
         $this->personal_id = str_pad($this->personal_id, 11, '0', STR_PAD_LEFT);

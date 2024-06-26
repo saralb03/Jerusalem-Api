@@ -23,6 +23,13 @@ enum ValidColumns: string
     case CLASSIFICATION = 'classification';
     case CLASSIFICATION_NAME = 'classificationName';
     case PHONE_NUMBER = 'phoneNumber';
+    case PROFESSION = 'profession';
+    case GENDER = 'gender';
+    case RELIGION = 'religion';
+    case COUNTRY_OF_BIRTH = 'countryOfBirth';
+    case RELEASE_DATE = 'releaseDate';
+    case POPULATION = 'population';
+    case PREFIX = 'prefix';
 
     public function toSnake(): string
     {
