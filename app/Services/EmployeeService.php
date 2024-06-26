@@ -16,7 +16,6 @@ class EmployeeService
 {
     public function index(array $requestedColumns): Collection
     {
-        $this->update("C:\\Users\\Emet-Dev\\Documents\\New folder\\employees-2.csv");
         $validColumns = [];
         foreach ($requestedColumns as $column) {
             if (!ValidColumns::isValidColumn($column)) {
@@ -83,12 +82,12 @@ class EmployeeService
             foreach ($employeeDTOs as $dto) {
                 $employee = Employee::updateOrCreate(
                     ['personal_number' => $dto->personal_number],
-                    []
+                    (array)$dto
                 );
 
                 $dto->employee_id = $employee->id;
-                Details::updateOrCreate(
-                    ['personal_id' => $dto->personal_id],
+                $details =Details::updateOrCreate(
+                    ['employee_id' => $dto->employee_id],
                     (array)$dto
                 );
             }

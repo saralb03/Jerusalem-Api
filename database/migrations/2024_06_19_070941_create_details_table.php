@@ -29,7 +29,8 @@ return new class extends Migration
             $table->string('religion')->nullable();
             $table->string('country_of_birth')->nullable();
             $table->date('release_date')->nullable();
-
+            
+            $table->timestamps();
             $table->unsignedBigInteger('employee_id');
             $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
         });
