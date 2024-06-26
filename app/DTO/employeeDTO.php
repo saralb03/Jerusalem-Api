@@ -51,17 +51,12 @@ class EmployeeDTO
         $this->country_of_birth = $data['ארץ לידה'] ?? null;
         $this->release_date = $data['תאריך שחרור'];
     }
-    private function convertPersonalId(string $personalId): string
+    private function convertPersonalNumber(): void
     {
-        return str_pad($personalId, 11, '0', STR_PAD_LEFT);
-    }
-    private function convertPersonalNumber(string $personalNumber): string
-    {
-        $length = strlen($personalNumber);
+        $length = strlen($this->personal_number);
         if ($length == 9 || $length == 11) {
-            return substr($personalNumber, $length - 9, 7);
+            $this->personal_number =  substr($this->personal_number, $length - 9, 7);
         }
-        return $personalNumber;
     }
     private function convertName(string $name): string
     {
@@ -69,11 +64,7 @@ class EmployeeDTO
         $name = preg_replace('/[^\p{Hebrew}\s]/u', '', $name);
         return $name;
     }
-    private function convertRank(string $rank): string
-    {
-        return preg_replace('/[^\p{Hebrew}\s]/u', '', $rank);
-    }
-    private function convertDate(string $date): ?string
+    private function convertDate($date): ?string
     {
         if ($date) {
             $date = \DateTime::createFromFormat('d.m.Y', $date);
@@ -81,34 +72,30 @@ class EmployeeDTO
         }
         return null;
     }
-    private function convertPhone(string $phone): ?string
+    private function convertPhone(): void
     {
-        $phone = preg_replace('/[^0-9]/', '', $phone);
+        $phone = preg_replace('/[^0-9]/', '', $this->phone_number);
         if (strlen($phone) == 9 && $phone[0] !== '0') {
-            $phone = '0' . $phone;
+            $this->phone_number = '0' . $phone;
+        } else if (strlen($phone) != 10) {
+            $this->phone_number = null;
+        } else {
+            $this->phone_number = substr($phone, 0, 3) . '-' . substr($phone, 3);
         }
-        if (strlen($phone) != 10) {
-            return null;
-        }
-        return substr($phone, 0, 3) . '-' . substr($phone, 3);
-    }
-    private function createUsername(): void
-    {
-        $this->user_name =  'army\\' . $this->prefix . $this->personal_number;
-        dd($this->user_name);
     }
     public function convertDTO(): void
     {
-        $this->personal_id = $this->convertPersonalId($this->personal_id);
-        $this->personal_number = $this->convertPersonalNumber($this->personal_number);
+        $this->personal_id = str_pad($this->personal_id, 11, '0', STR_PAD_LEFT);
+        $this->convertPersonalNumber();
         $this->prefix = Population::from($this->population)->getPrefix();
-        $this->rank = $this->convertRank($this->rank);
+        $this->rank = preg_replace('/[^\p{Hebrew}\s]/u', '', $this->rank);
         $this->first_name = $this->convertName($this->first_name);
         $this->surname = $this->convertName($this->surname);
         $this->date_of_birth = $this->convertDate($this->date_of_birth);
         $this->security_class_start_date = $this->convertDate($this->security_class_start_date);
         $this->classification_name = ClassificationName::toHebrew($this->classification);
-        $this->phone_number = $this->convertPhone($this->phone_number);
-        $this->createUsername();
+        $this->convertPhone();
+        $this->release_date = $this->convertDate($this->release_date);
+        $this->user_name =  'army\\' . $this->prefix . $this->personal_number;
     }
 }
