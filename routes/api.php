@@ -32,4 +32,5 @@ Route::controller(EmployeeController::class)
     ->group(function () {
         Route::get('/', 'index');
         Route::post('/import', 'import');
+        Route::get('/update', 'update');
     });

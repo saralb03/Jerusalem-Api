@@ -154,4 +154,15 @@ class EmployeeController extends Controller
             default => response()->json(['error' => 'Error importing CSV file: ' . $result], Response::HTTP_INTERNAL_SERVER_ERROR),
         };
     }
+
+    public function update(): JsonResponse
+    {
+        $result = $this->employeeService->update("C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv");
+
+        return match ($result) {
+            Status::NOT_FOUND => response()->json(['error' => 'File not found.'], Response::HTTP_NOT_FOUND),
+            Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),
+            default => response()->json(['error' => 'Error importing CSV file: ' . $result], Response::HTTP_INTERNAL_SERVER_ERROR),
+        };
+    }
 }

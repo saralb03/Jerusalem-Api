@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('details', function (Blueprint $table) {
             $table->id();
-            $table->string('ranks')->nullable();
+            $table->string('rank')->nullable();
             $table->string('department')->nullable();
             $table->string('branch')->nullable();
             $table->string('section')->nullable();
