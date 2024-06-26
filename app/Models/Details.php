@@ -4,41 +4,37 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Details extends Model
 {
     use HasFactory;
-    use SoftDeletes;
 
     protected $guard_name = "passport";
 
     protected $fillable = [
-        'personal_id',
-        'prefix',
-        'ranks',
-        'surname',
-        'first_name',
+        'rank',
         'department',
         'branch',
         'section',
         'division',
         'date_of_birth',
         'security_class_start_date',
-        'service_start_date',
         'age',
         'classification',
         'classification_name',
-        'population_id',
-        'employee_id',
         'phone_number',
+        'profession',
+        'gender',
+        'religion',
+        'country_of_birth',
+        'release_date',
+        'employee_id',
     ];
 
     protected $hidden = [
         'id',
         'created_at',
         'updated_at',
-        'deleted_at'
     ];
 
     public function employee()
