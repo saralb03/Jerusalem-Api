@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum ServiceType: string
+enum Population: string
 {
     case MISSION_CIVILAN = 'אזרח משימתי';
     case REGULARITY = 'קבע';

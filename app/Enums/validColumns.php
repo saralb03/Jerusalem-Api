@@ -15,18 +15,14 @@ enum ValidColumns: string
     case BRANCH = 'branch';
     case SECTION = 'section';
     case DIVISION = 'division';
-    case SERVICE_TYPE = 'serviceType';
     case USER_NAME = 'userName';
-    case TYPE = 'type';
     case DATE_OF_BIRTH = 'dateOfBirth';
     case SECURITY_CLASS_START_DATE = 'securityClassStartDate';
     case SERVICE_START_DATE = 'serviceStartDate';
-    case SOLIDER_TYPE = 'soliderType';
     case AGE = 'age';
     case CLASSIFICATION = 'classification';
     case CLASSIFICATION_NAME = 'classificationName';
     case PHONE_NUMBER = 'phoneNumber';
-    case POPULATION_ID = 'populationId';
 
     public function toSnake(): string
     {
