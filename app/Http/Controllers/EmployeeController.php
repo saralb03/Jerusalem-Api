@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Status;
 use App\Http\Requests\IndexEmployeeRequest;
 use App\Services\EmployeeService;
 use Illuminate\Http\File;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  *  * @OA\Info(
  *     title="Employee API",
@@ -19,8 +23,7 @@ use OpenApi\Annotations as OA;
  * )
  * @OA\Schema(
  *     schema="Employee",
- *     required={"id", "personal_id", "personal_number", "ranks", "surname", "first_name", "department", "division", "service_type", "date_of_birth", "service_type_code", "security_class_start_date", "service_start_date", "solider_type", "age", "classification", "classification_name", "phone_number", "deleted_at"},
- *     @OA\Property(property="id", type="integer", example=1),
+ *     required={"personal_id", "personal_number", "ranks", "surname", "first_name", "department", "division", "service_type", "date_of_birth", "service_type_code", "security_class_start_date", "service_start_date", "solider_type", "age", "classification", "classification_name", "phone_number", "deleted_at"},
  *     @OA\Property(property="personal_id", type="string", example="209959501"),
  *     @OA\Property(property="personal_number", type="string", example="5252568"),
  *     @OA\Property(property="prefix", type="string", example="S"),
@@ -40,7 +43,6 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="classification_name", type="string", example="סודי"),
  *     @OA\Property(property="population_id", type="integer", example=1),
  *     @OA\Property(property="phone_number", type="string", example="055-9254116"),
- *     @OA\Property(property="deleted_at", type="string", nullable=true, example=null),
  * )
  */
 class EmployeeController extends Controller
@@ -53,7 +55,7 @@ class EmployeeController extends Controller
     }
 
     // public function __construct(public readonly EmployeeService $employeeService) { }
-    
+
     /**
      * @OA\Get(
      *     path="/api/employees",
@@ -64,7 +66,7 @@ class EmployeeController extends Controller
      *         in="query",
      *         description="Comma-separated list of columns to retrieve",
      *         required=false,
-     *         example="id,personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at",
+     *         example="personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at",
      *         @OA\Schema(type="string")
      *     ),
      *     @OA\Response(
@@ -85,27 +87,71 @@ class EmployeeController extends Controller
      *     )
      * )
      */
-    public function index(IndexEmployeeRequest $request)
+    public function index(IndexEmployeeRequest $request): JsonResponse
     {
         $requestedColumns = $request->query('columns') ? explode(',', $request->query('columns')) : [];
-        return $this->employeeService->index($requestedColumns);
+        $employees =  $this->employeeService->index($requestedColumns);
+        return response()->json($employees, Response::HTTP_OK);
     }
 
-    public function update()
-    {
-        return $this->employeeService->update();
-    }
-
-    public function import(Request $request)
+  
+    /**
+     * @OA\Post(
+     *     path="/api/employees/import",
+     *     summary="Import employees from a CSV file",
+     *     tags={"Employees"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                     property="file",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="CSV file to be uploaded"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="CSV file imported successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="CSV file imported successfully")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="404",
+     *         description="No file uploaded",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="No file uploaded.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response="500",
+     *         description="Error importing CSV file",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Error importing CSV file: [error message]")
+     *         )
+     *     )
+     * )
+     */
+    public function import(Request $request): JsonResponse
     {
         $request->validate([
             'file' => 'required|mimes:csv,txt|max:2048',
         ]);
 
         $file = $request->file('file');
-        
-        $symfonyFile = new File($file->getPathname());
+        $extractedFile = new File($file->getPathname());
+      
+        $result = $this->employeeService->import($extractedFile);
 
-        return $this->employeeService->import($symfonyFile);
+        return match ($result) {
+            Status::NOT_FOUND => response()->json(['error' => 'No file uploaded.'], Response::HTTP_NOT_FOUND),
+            Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),
+            default => response()->json(['error' => 'Error importing CSV file: ' . $result], Response::HTTP_INTERNAL_SERVER_ERROR),
+        };
     }
 }

@@ -26,7 +26,7 @@
                         "schema": {
                             "type": "string"
                         },
-                        "example": "id,personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at"
+                        "example": "personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at"
                     }
                 ],
                 "responses": {
@@ -51,13 +51,88 @@
                     }
                 }
             }
+        },
+        "/api/employees/import": {
+            "post": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Import employees from a CSV file",
+                "operationId": "bcf779aeb89f42d52e8445b5e8897cd6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "description": "CSV file to be uploaded",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "CSV file imported successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "CSV file imported successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No file uploaded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "No file uploaded."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error importing CSV file",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error importing CSV file: [error message]"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
         "schemas": {
             "Employee": {
                 "required": [
-                    "id",
                     "personal_id",
                     "personal_number",
                     "ranks",
@@ -78,10 +153,6 @@
                     "deleted_at"
                 ],
                 "properties": {
-                    "id": {
-                        "type": "integer",
-                        "example": 1
-                    },
                     "personal_id": {
                         "type": "string",
                         "example": "209959501"
@@ -160,11 +231,6 @@
                     "phone_number": {
                         "type": "string",
                         "example": "055-9254116"
-                    },
-                    "deleted_at": {
-                        "type": "string",
-                        "example": null,
-                        "nullable": true
                     }
                 },
                 "type": "object"

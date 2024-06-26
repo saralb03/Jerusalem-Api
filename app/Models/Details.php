@@ -23,12 +23,9 @@ class Details extends Model
         'branch',
         'section',
         'division',
-        'service_type',
         'date_of_birth',
-        'service_type_code',
         'security_class_start_date',
         'service_start_date',
-        'solider_type',
         'age',
         'classification',
         'classification_name',
@@ -38,6 +35,7 @@ class Details extends Model
     ];
 
     protected $hidden = [
+        'id',
         'created_at',
         'updated_at',
         'deleted_at'
