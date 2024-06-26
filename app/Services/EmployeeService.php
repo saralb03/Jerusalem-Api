@@ -17,6 +17,7 @@ class EmployeeService
 {
     public function index(array $requestedColumns): Collection
     {
+        $this->update();
         $validColumns = [];
         foreach ($requestedColumns as $column) {
             if (!ValidColumns::isValidColumn($column)) {
@@ -26,7 +27,6 @@ class EmployeeService
         }
       
         $employees = Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
-        // ->leftJoin('details', 'population.identifier', '=', 'details.population_id')
             ->when($validColumns, function ($query) use ($validColumns) {
                 $query->select($validColumns);
             })
@@ -35,12 +35,32 @@ class EmployeeService
         return $employees;
     }
 
+    public function index1(array $requestedColumns): Collection
+{
+    $validColumns = [];
+    foreach ($requestedColumns as $column) {
+        if (!ValidColumns::isValidColumn($column)) {
+            continue;
+        }
+        $validColumns[] = ValidColumns::from($column)->toSnake();
+    }
+
+    $employees = Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
+        ->when($validColumns, function ($query) use ($validColumns) {
+            $query->select($validColumns);
+        })
+        ->whereNull('details.id') // Add this line to filter out employees with no details
+        ->select('employees.*')
+        ->get();
+
+    return $employees;
+}
   
     public function update(): Status | string
     {
         $filePath = "C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv";
         // $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees-2.csv";
-      
+        
         $columnMapping = [
             'תז' => 'personal_id',
             'מספר אישי' => 'personal_number',
@@ -52,22 +72,19 @@ class EmployeeService
             'ענף' => 'branch',
             'מדור' => 'section',
             'יחידה' => 'division',
-            'סוג שרות' => 'service_type',
             'תאריך לידה' => 'date_of_birth',
-            'קוד סוג ש' => 'service_type_code',
             'תאריך תחילת סוש' => 'security_class_start_date',
             'תאריך תחילת שרות' => 'service_start_date',
-            'סוג חייל' => 'solider_type',
             'גיל' => 'age',
             'סיווג' => 'classification',
             'מזהה אוכלוסיה' => 'population_id',
             'טלפון' => 'phone_number',
         ];
-
+        
         if (!file_exists($filePath)) {
             return Status::NOT_FOUND;
         }
-
+        
         $fileContents = file($filePath);
         $headers = str_getcsv(array_shift($fileContents));
         $dbHeaders = array_map(function ($header) use ($columnMapping) {
@@ -81,7 +98,6 @@ class EmployeeService
             $employeeData = array_combine($dbHeaders, $data);
 
             $employeeDTO = new EmployeeDTO($employeeData);
-
              if (!EmployeeValidator::validate((array) $employeeDTO)) {
                 continue;
             }
@@ -104,11 +120,9 @@ class EmployeeService
             }
 
             foreach ($employeeDTOs as $dto) {
-                $employee = Employee::withTrashed()->updateOrCreate(
+                $employee = Employee::updateOrCreate(
                     ['personal_number' => $dto->personal_number],
                     [
-                        'user_name' => $dto->user_name,
-                        'type' => $dto->type,
                     ]
                 );
 
@@ -147,14 +161,12 @@ class EmployeeService
             foreach ($fileContents as $line) {
                 $data = str_getcsv($line);
                 $rowData = array_combine($headers, $data);
-                $employee = Employee::withTrashed()->updateOrCreate(
+                $employee = Employee::updateOrCreate(
                     [
                         'personal_number' => $rowData["personal_number"],
-                        'type' => EmployeeType::NOT_REGULAR->value,
                     ],
                     [
                         'user_name' => $rowData["user_name"],
-                        'type' => EmployeeType::NOT_REGULAR->value,
                     ]
                 );
 
