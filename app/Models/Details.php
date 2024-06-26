@@ -16,7 +16,7 @@ class Details extends Model
     protected $fillable = [
         'personal_id',
         'prefix',
-        'ranks',
+        'rank',
         'surname',
         'first_name',
         'department',

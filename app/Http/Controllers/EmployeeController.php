@@ -23,11 +23,11 @@ use Symfony\Component\HttpFoundation\Response;
  * )
  * @OA\Schema(
  *     schema="Employee",
- *     required={"personal_id", "personal_number", "ranks", "surname", "first_name", "department", "division", "service_type", "date_of_birth", "service_type_code", "security_class_start_date", "service_start_date", "solider_type", "age", "classification", "classification_name", "phone_number", "deleted_at"},
+ *     required={"personal_id", "personal_number", "rank", "surname", "first_name", "department", "division", "service_type", "date_of_birth", "service_type_code", "security_class_start_date", "service_start_date", "solider_type", "age", "classification", "classification_name", "phone_number", "deleted_at"},
  *     @OA\Property(property="personal_id", type="string", example="209959501"),
  *     @OA\Property(property="personal_number", type="string", example="5252568"),
  *     @OA\Property(property="prefix", type="string", example="S"),
- *     @OA\Property(property="ranks", type="string", example="Ravet"),
+ *     @OA\Property(property="rank", type="string", example="Ravet"),
  *     @OA\Property(property="surname", type="string", example="Gorinstein"),
  *     @OA\Property(property="first_name", type="string", example="Sarah Leah"),
  *     @OA\Property(property="department", type="string", example=""),
@@ -47,14 +47,14 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class EmployeeController extends Controller
 {
-    protected $employeeService;
+    // protected $employeeService;
 
-    public function __construct(EmployeeService $employeeService)
-    {
-        $this->employeeService = $employeeService;
-    }
+    // public function __construct(EmployeeService $employeeService)
+    // {
+    //     $this->employeeService = $employeeService;
+    // }
 
-    // public function __construct(public readonly EmployeeService $employeeService) { }
+    public function __construct(public readonly EmployeeService $employeeService) { }
 
     /**
      * @OA\Get(
@@ -66,7 +66,7 @@ class EmployeeController extends Controller
      *         in="query",
      *         description="Comma-separated list of columns to retrieve",
      *         required=false,
-     *         example="personal_id,personal_number,ranks,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at",
+     *         example="personal_id,personal_number,rank,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at",
      *         @OA\Schema(type="string")
      *     ),
      *     @OA\Response(
@@ -94,7 +94,6 @@ class EmployeeController extends Controller
         return response()->json($employees, Response::HTTP_OK);
     }
 
-  
     /**
      * @OA\Post(
      *     path="/api/employees/import",

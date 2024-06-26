@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\DTO\EmployeeDTO;
 use App\Enums\Status;
-use App\Enums\EmployeeType;
 use App\Enums\ValidColumns;
 use App\Models\Details;
 use App\Models\Employee;
@@ -17,7 +16,7 @@ class EmployeeService
 {
     public function index(array $requestedColumns): Collection
     {
-        $this->update();
+        $this->update("C:\\Users\\Emet-Dev\\Documents\\New folder\\employees-2.csv");
         $validColumns = [];
         foreach ($requestedColumns as $column) {
             if (!ValidColumns::isValidColumn($column)) {
@@ -25,7 +24,7 @@ class EmployeeService
             }
             $validColumns[] = ValidColumns::from($column)->toSnake();
         }
-      
+
         $employees = Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
             ->when($validColumns, function ($query) use ($validColumns) {
                 $query->select($validColumns);
@@ -35,107 +34,63 @@ class EmployeeService
         return $employees;
     }
 
-    public function index1(array $requestedColumns): Collection
-{
-    $validColumns = [];
-    foreach ($requestedColumns as $column) {
-        if (!ValidColumns::isValidColumn($column)) {
-            continue;
-        }
-        $validColumns[] = ValidColumns::from($column)->toSnake();
-    }
+    // public function index1(array $requestedColumns): Collection
+    // {
+    //     $validColumns = [];
+    //     foreach ($requestedColumns as $column) {
+    //         if (!ValidColumns::isValidColumn($column)) {
+    //             continue;
+    //         }
+    //         $validColumns[] = ValidColumns::from($column)->toSnake();
+    //     }
 
-    $employees = Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
-        ->when($validColumns, function ($query) use ($validColumns) {
-            $query->select($validColumns);
-        })
-        ->whereNull('details.id') // Add this line to filter out employees with no details
-        ->select('employees.*')
-        ->get();
+    //     $employees = Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
+    //         ->when($validColumns, function ($query) use ($validColumns) {
+    //             $query->select($validColumns);
+    //         })
+    //         ->whereNull('details.id') // Add this line to filter out employees with no details
+    //         ->select('employees.*')
+    //         ->get();
 
-    return $employees;
-}
-  
-    public function update(): Status | string
+    //     return $employees;
+    // }
+
+    public function update(string $filePath): Status | string
     {
-        $filePath = "C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv";
+        // $filePath = "C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv";
         // $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees-2.csv";
-        
-        $columnMapping = [
-            'תז' => 'personal_id',
-            'מספר אישי' => 'personal_number',
-            'דרגה' => 'ranks',
-            'שם משפחה' => 'surname',
-            'שם פרטי' => 'first_name',
-            'שם משתמש' => 'user_name',
-            'מחלקה' => 'department',
-            'ענף' => 'branch',
-            'מדור' => 'section',
-            'יחידה' => 'division',
-            'תאריך לידה' => 'date_of_birth',
-            'תאריך תחילת סוש' => 'security_class_start_date',
-            'תאריך תחילת שרות' => 'service_start_date',
-            'גיל' => 'age',
-            'סיווג' => 'classification',
-            'מזהה אוכלוסיה' => 'population_id',
-            'טלפון' => 'phone_number',
-        ];
-        
+
         if (!file_exists($filePath)) {
             return Status::NOT_FOUND;
         }
-        
+
         $fileContents = file($filePath);
         $headers = str_getcsv(array_shift($fileContents));
-        $dbHeaders = array_map(function ($header) use ($columnMapping) {
-            return $columnMapping[$header] ?? null;
-        }, $headers);
         $employeeDTOs = [];
-        $csvPersonalIds = [];
-
         foreach ($fileContents as $line) {
             $data = str_getcsv($line);
-            $employeeData = array_combine($dbHeaders, $data);
-
+            $employeeData = array_combine($headers, $data);
             $employeeDTO = new EmployeeDTO($employeeData);
-             if (!EmployeeValidator::validate((array) $employeeDTO)) {
+            if (!EmployeeValidator::validate((array) $employeeDTO)) {
                 continue;
             }
-
             $employeeDTO->convertDTO();
             $employeeDTOs[] = $employeeDTO;
-            $csvPersonalIds[] = $employeeDTO->personal_id;
-            $csvPersonalNumbers[] = $employeeData["personal_number"];
         }
 
         DB::beginTransaction();
         try {
-            $employees = Employee::with('details')
-                ->where('type', 1)
-                ->whereNotIn('personal_number', $csvPersonalNumbers)->get();
-
-            foreach ($employees as $employee) {
-                $employee->details()->delete();
-                $employee->delete();
-            }
-
             foreach ($employeeDTOs as $dto) {
                 $employee = Employee::updateOrCreate(
                     ['personal_number' => $dto->personal_number],
-                    [
-                    ]
+                    []
                 );
 
                 $dto->employee_id = $employee->id;
-                $details = Details::withTrashed()->updateOrCreate(
+                Details::updateOrCreate(
                     ['personal_id' => $dto->personal_id],
                     (array)$dto
                 );
-
-                if ($employee->trashed()) {
-                    $employee->restore();
-                    $details->restore();
-                }
             }
 
             DB::commit();
@@ -146,7 +101,7 @@ class EmployeeService
         }
     }
 
-  
+
     public function import(File $file): Status|string
     {
         if (!$file) {
@@ -156,12 +111,11 @@ class EmployeeService
         try {
             $fileContents = file($file->getPathname());
             $headers = str_getcsv(array_shift($fileContents));
-            $processedPersonalNumbers = [];
 
             foreach ($fileContents as $line) {
                 $data = str_getcsv($line);
                 $rowData = array_combine($headers, $data);
-                $employee = Employee::updateOrCreate(
+                Employee::updateOrCreate(
                     [
                         'personal_number' => $rowData["personal_number"],
                     ],
@@ -169,16 +123,7 @@ class EmployeeService
                         'user_name' => $rowData["user_name"],
                     ]
                 );
-
-                if ($employee->trashed()) {
-                    $employee->restore();
-                }
-                $processedPersonalNumbers[] = $rowData["personal_number"];
             }
-
-            Employee::where('type', EmployeeType::NOT_REGULAR->value)
-                ->whereNotIn('personal_number', $processedPersonalNumbers)
-                ->delete();
 
             return Status::OK;
         } catch (\Exception $e) {

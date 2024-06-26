@@ -26,7 +26,7 @@ class IndexEmployeeRequest extends FormRequest
         $fillableColumns = [
             'personal_id',
             'personal_number',
-            'ranks',
+            'rank',
             'surname',
             'first_name',
             'department',
