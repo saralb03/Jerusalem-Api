@@ -23,26 +23,31 @@ use Symfony\Component\HttpFoundation\Response;
  * )
  * @OA\Schema(
  *     schema="Employee",
- *     required={"personal_id", "personal_number", "rank", "surname", "first_name", "department", "division", "service_type", "date_of_birth", "service_type_code", "security_class_start_date", "service_start_date", "solider_type", "age", "classification", "classification_name", "phone_number", "deleted_at"},
- *     @OA\Property(property="personal_id", type="string", example="209959501"),
- *     @OA\Property(property="personal_number", type="string", example="5252568"),
- *     @OA\Property(property="prefix", type="string", example="S"),
- *     @OA\Property(property="rank", type="string", example="Ravet"),
- *     @OA\Property(property="surname", type="string", example="Gorinstein"),
- *     @OA\Property(property="first_name", type="string", example="Sarah Leah"),
- *     @OA\Property(property="department", type="string", example=""),
- *     @OA\Property(property="division", type="string", example="Chetz"),
- *     @OA\Property(property="service_type", type="string", example="חובה"),
- *     @OA\Property(property="date_of_birth", type="string", format="date", example="2003-06-03"),
- *     @OA\Property(property="service_type_code", type="integer", example=1),
- *     @OA\Property(property="security_class_start_date", type="string", format="date", example="2006-05-04"),
- *     @OA\Property(property="service_start_date", type="string", format="date", example="2008-07-04"),
- *     @OA\Property(property="solider_type", type="string", example="חייל"),
- *     @OA\Property(property="age", type="integer", example=21),
- *     @OA\Property(property="classification", type="integer", example=4),
- *     @OA\Property(property="classification_name", type="string", example="סודי"),
- *     @OA\Property(property="population_id", type="integer", example=1),
- *     @OA\Property(property="phone_number", type="string", example="055-9254116"),
+ *     required={"personal_id", "personal_number", "first_name", "surname", "rank", "division", "date_of_birth", "age", "phone_number"},
+ *     @OA\Property(property="personal_id", type="string", example="00305948276"),
+ *     @OA\Property(property="personal_number", type="string", example="3259689"),
+ *     @OA\Property(property="first_name", type="string", example="אדם"),
+ *     @OA\Property(property="surname", type="string", example="הראשון"),
+ *     @OA\Property(property="user_name", type="string", example="army\s3259687"),
+ *     @OA\Property(property="population", type="string", example="קבע"),
+ *     @OA\Property(property="prefix", type="string", example="s"),
+ *     @OA\Property(property="rank", type="string", example="סגן"),
+ *     @OA\Property(property="department", type="string", example=null),
+ *     @OA\Property(property="branch", type="string", example=null),
+ *     @OA\Property(property="section", type="string", example=null),
+ *     @OA\Property(property="division", type="string", example="בסיס 128 לשכות"),
+ *     @OA\Property(property="date_of_birth", type="string", format="date", example="2005-04-10"),
+ *     @OA\Property(property="security_class_start_date", type="string", format="date", example="2012-09-04"),
+ *     @OA\Property(property="age", type="integer", example=19),
+ *     @OA\Property(property="classification", type="integer", example=3),
+ *     @OA\Property(property="classification_name", type="string", example="סודי ביותר"),
+ *     @OA\Property(property="phone_number", type="string", example="0559254116"),
+ *     @OA\Property(property="profession", type="string", example="פסנתרן"),
+ *     @OA\Property(property="gender", type="string", example="זכר"),
+ *     @OA\Property(property="religion", type="string", example="יהודי"),
+ *     @OA\Property(property="country_of_birth", type="string", example="ישראל"),
+ *     @OA\Property(property="release_date", type="string", format="date", example="2013-09-04"),
+ *     @OA\Property(property="employee_id", type="integer", example=1)
  * )
  */
 class EmployeeController extends Controller
@@ -54,7 +59,9 @@ class EmployeeController extends Controller
     //     $this->employeeService = $employeeService;
     // }
 
-    public function __construct(public readonly EmployeeService $employeeService) { }
+    public function __construct(public readonly EmployeeService $employeeService)
+    {
+    }
 
     /**
      * @OA\Get(
@@ -66,7 +73,7 @@ class EmployeeController extends Controller
      *         in="query",
      *         description="Comma-separated list of columns to retrieve",
      *         required=false,
-     *         example="personal_id,personal_number,rank,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at",
+     *         example="personal_id,personal_number,rank,surname,first_name,department,division,date_of_birth,age,phone_number",
      *         @OA\Schema(type="string")
      *     ),
      *     @OA\Response(
@@ -87,6 +94,7 @@ class EmployeeController extends Controller
      *     )
      * )
      */
+
     public function index(IndexEmployeeRequest $request): JsonResponse
     {
         $requestedColumns = $request->query('columns') ? explode(',', $request->query('columns')) : [];
@@ -144,7 +152,7 @@ class EmployeeController extends Controller
 
         $file = $request->file('file');
         $extractedFile = new File($file->getPathname());
-      
+
         $result = $this->employeeService->update($extractedFile, false);
 
         return match ($result) {
