@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::call(function () {
     try {
         $employeeService = new EmployeeService();
-        $employeeService->update(env('DAILY_FILE_ADDRESS'));
+        $employeeService->update(env('DAILY_FILE_ADDRESS'), true);
         Log::info('Employees updated successfully.');
     } catch (\Exception $e) {
         Log::error($e->getMessage());
