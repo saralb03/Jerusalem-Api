@@ -28,7 +28,7 @@ enum Rank: string
     case RESER = 'רס"ר';
     case TAAL = 'תא"ל';
 
-    public static function fromHebrew($hebrew): ?string
+    public static function fromHebrew(?string $hebrew): ?string
     {
         return match ($hebrew) {
             'אל"מ', 'אלם', 'אל"ם', 'אלמ' => self::ALM->value,
