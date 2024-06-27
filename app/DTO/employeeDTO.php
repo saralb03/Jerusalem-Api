@@ -117,6 +117,6 @@ class EmployeeDTO
         $this->convertPhone();
         $this->religion = Religion::validateReligion($this->religion);
         $this->release_date = $this->convertDate($this->release_date);
-        $this->user_name =  $this->user_name ? 'army\\' . $this->prefix . $this->personal_number : $this->user_name;
+        $this->user_name =  $this->user_name ? $this->user_name : 'army\\' . $this->prefix . $this->personal_number;
     }
 }

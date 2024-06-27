@@ -26,7 +26,7 @@
                         "schema": {
                             "type": "string"
                         },
-                        "example": "personal_id,personal_number,rank,surname,first_name,department,division,service_type,date_of_birth,service_type_code,security_class_start_date,service_start_date,solider_type,age,classification,classification_name,phone_number,deleted_at"
+                        "example": "personal_id,personal_number,rank,surname,first_name,department,division,date_of_birth,age,phone_number"
                     }
                 ],
                 "responses": {
@@ -135,102 +135,113 @@
                 "required": [
                     "personal_id",
                     "personal_number",
-                    "rank",
-                    "surname",
                     "first_name",
-                    "department",
+                    "surname",
+                    "rank",
                     "division",
-                    "service_type",
                     "date_of_birth",
-                    "service_type_code",
-                    "security_class_start_date",
-                    "service_start_date",
-                    "solider_type",
                     "age",
-                    "classification",
-                    "classification_name",
-                    "phone_number",
-                    "deleted_at"
+                    "phone_number"
                 ],
                 "properties": {
                     "personal_id": {
                         "type": "string",
-                        "example": "209959501"
+                        "example": "00305948276"
                     },
                     "personal_number": {
                         "type": "string",
-                        "example": "5252568"
-                    },
-                    "prefix": {
-                        "type": "string",
-                        "example": "S"
-                    },
-                    "rank": {
-                        "type": "string",
-                        "example": "Ravet"
-                    },
-                    "surname": {
-                        "type": "string",
-                        "example": "Gorinstein"
+                        "example": "3259689"
                     },
                     "first_name": {
                         "type": "string",
-                        "example": "Sarah Leah"
+                        "example": "אדם"
+                    },
+                    "surname": {
+                        "type": "string",
+                        "example": "הראשון"
+                    },
+                    "user_name": {
+                        "type": "string",
+                        "example": "army\\s3259687"
+                    },
+                    "population": {
+                        "type": "string",
+                        "example": "קבע"
+                    },
+                    "prefix": {
+                        "type": "string",
+                        "example": "s"
+                    },
+                    "rank": {
+                        "type": "string",
+                        "example": "סגן"
                     },
                     "department": {
                         "type": "string",
-                        "example": ""
+                        "example": null
+                    },
+                    "branch": {
+                        "type": "string",
+                        "example": null
+                    },
+                    "section": {
+                        "type": "string",
+                        "example": null
                     },
                     "division": {
                         "type": "string",
-                        "example": "Chetz"
-                    },
-                    "service_type": {
-                        "type": "string",
-                        "example": "חובה"
+                        "example": "בסיס 128 לשכות"
                     },
                     "date_of_birth": {
                         "type": "string",
                         "format": "date",
-                        "example": "2003-06-03"
-                    },
-                    "service_type_code": {
-                        "type": "integer",
-                        "example": 1
+                        "example": "2005-04-10"
                     },
                     "security_class_start_date": {
                         "type": "string",
                         "format": "date",
-                        "example": "2006-05-04"
-                    },
-                    "service_start_date": {
-                        "type": "string",
-                        "format": "date",
-                        "example": "2008-07-04"
-                    },
-                    "solider_type": {
-                        "type": "string",
-                        "example": "חייל"
+                        "example": "2012-09-04"
                     },
                     "age": {
                         "type": "integer",
-                        "example": 21
+                        "example": 19
                     },
                     "classification": {
                         "type": "integer",
-                        "example": 4
+                        "example": 3
                     },
                     "classification_name": {
                         "type": "string",
-                        "example": "סודי"
-                    },
-                    "population_id": {
-                        "type": "integer",
-                        "example": 1
+                        "example": "סודי ביותר"
                     },
                     "phone_number": {
                         "type": "string",
-                        "example": "055-9254116"
+                        "example": "0559254116"
+                    },
+                    "profession": {
+                        "type": "string",
+                        "example": "פסנתרן"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "example": "זכר"
+                    },
+                    "religion": {
+                        "type": "string",
+                        "example": "יהודי"
+                    },
+                    "country_of_birth": {
+                        "type": "string",
+                        "example": "ישראל"
+                    },
+                    "release_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2013-09-04"
+                    },
+                    "employee_id": {
+                        "type": "integer",
+                        "example": 1
                     }
                 },
                 "type": "object"
