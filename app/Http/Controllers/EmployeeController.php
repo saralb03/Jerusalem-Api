@@ -145,7 +145,7 @@ class EmployeeController extends Controller
         $file = $request->file('file');
         $extractedFile = new File($file->getPathname());
       
-        $result = $this->employeeService->import($extractedFile);
+        $result = $this->employeeService->update($extractedFile);
 
         return match ($result) {
             Status::NOT_FOUND => response()->json(['error' => 'No file uploaded.'], Response::HTTP_NOT_FOUND),
@@ -157,7 +157,7 @@ class EmployeeController extends Controller
 
     public function update(): JsonResponse
     {
-        $result = $this->employeeService->update("C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv");
+        $result = $this->employeeService->update(env('DAILY_FILE_ADDRESS'));
         return match ($result) {
             Status::NOT_FOUND => response()->json(['error' => 'File not found.'], Response::HTTP_NOT_FOUND),
             Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),

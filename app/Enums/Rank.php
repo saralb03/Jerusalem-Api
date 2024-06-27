@@ -4,7 +4,7 @@ namespace App\Enums;
 
 enum Rank: string
 {
-    case ELEM = 'אל"מ';
+    case ALM = 'אל"מ';
     case ALUF = 'אלוף';
     case ALEF = 'אלף';
     case AATZ = 'אע"צ';
@@ -28,4 +28,36 @@ enum Rank: string
     case RESEN = 'רס"נ';
     case RESER = 'רס"ר';
     case TAAL = 'תא"ל';
+
+
+    // public static function fromHebrew(string $hebrew): ?self
+    // {
+    //     return match ($hebrew) {
+    //         'אלמ','אלם' => self::ALM->value,
+    //         'אעב' => self::AYB,
+    //         'אעץ' => self::AYC,
+    //         'טוראי' => self::TORAI,
+    //         'סאל' => self::SAL,
+    //         'סגמ', 'סגם' => self::SAGM,
+    //         'סגן' => self::SAGAN,
+    //         'סמל' => self::SAMAL,
+    //         'סמר' => self::SMR,
+    //         'סדר' => self::SADER,
+    //         'קאב' => self::KAAV,
+    //         'קמא' => self::KMA,
+    //         'רביט' => self::RBIT,
+    //         'רג' => self::RG,
+    //         'רסב' => self::RASB,
+    //         'רסל' => self::RASIL,
+    //         'רסם' => self::RASM,
+    //         'רסן' => self::RSN,
+    //         'רסר' => self::RSR,
+    //         'תאל' => self::TAAL,
+    //         'אלף' => self::ALEF,
+    //         'אב' => self::AV,
+    //         'עדי' => self::ADI,
+    //         'תור' => self::TAUR,
+    //         default => null,
+    //     };
+    // }
 }
