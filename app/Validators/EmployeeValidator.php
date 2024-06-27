@@ -4,6 +4,8 @@ namespace App\Validators;
 use App\Enums\Division;
 use Illuminate\Support\Facades\Validator;
 use App\Enums\Population;
+use App\Enums\Rank;
+use App\Enums\Religion;
 use Illuminate\Validation\Rule;
 class EmployeeValidator
 {
@@ -20,7 +22,11 @@ class EmployeeValidator
                 'string',
                 Rule::in(Population::cases()),
             ],
-            'rank' => 'required|string',
+            'rank' => [
+               'required',
+               'string', 
+               Rule::in(Rank::cases()),
+            ],
             'department' => 'nullable|string',
             'branch' => 'nullable|string',
             'section' => 'nullable|string',
@@ -36,11 +42,15 @@ class EmployeeValidator
             'phone_number' => 'required|string',
             'profession' => 'nullable|string',
             'gender' => 'nullable|string',
-            'religion' => 'nullable|string',
+            'religion' => [
+                'nullable',
+                'string',
+                Rule::in(Religion::cases()),
+            ],
             'country_of_birth' => 'nullable|string',
             'release_date' => 'required',
         ]);
-        
+
         return $validator->passes();
     }
 }

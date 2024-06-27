@@ -2,6 +2,8 @@
 namespace App\DTO;
 use App\Enums\ClassificationName;
 use App\Enums\Population;
+use App\Enums\Religion;
+
 class EmployeeDTO
 {
     public $personal_id;
@@ -28,6 +30,7 @@ class EmployeeDTO
     public $country_of_birth;
     public $release_date;
     public $employee_id;
+
     public function __construct(array $data)
     {
         $this->personal_id = $data['תז'] ?? $data['ת"ז'];
@@ -90,7 +93,7 @@ class EmployeeDTO
         }
     }
     
-    
+
     public function convertDTO(): void
     {
         $this->personal_id = str_pad($this->personal_id, 11, '0', STR_PAD_LEFT);
