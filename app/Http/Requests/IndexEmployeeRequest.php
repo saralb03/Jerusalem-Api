@@ -39,7 +39,6 @@ class IndexEmployeeRequest extends FormRequest
             'age',
             'classification',
             'classification_name',
-            'population_id',
             'phone_number',
         ];
 

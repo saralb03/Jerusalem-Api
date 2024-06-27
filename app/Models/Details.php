@@ -1,16 +1,11 @@
 <?php
-
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 class Details extends Model
 {
     use HasFactory;
-
     protected $guard_name = "passport";
-
     protected $fillable = [
         'rank',
         'department',
@@ -30,13 +25,11 @@ class Details extends Model
         'release_date',
         'employee_id',
     ];
-
     protected $hidden = [
         'id',
         'created_at',
         'updated_at',
     ];
-
     public function employee()
     {
         return $this->belongsTo(Employee::class);

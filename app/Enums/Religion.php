@@ -4,24 +4,21 @@ namespace App\Enums;
 
 enum Religion: string
 {
-    case JEW = "יהודי";
-    case BEDOUIN = "בדואי";
-    case DRUZE = "דרוזי";
-    case CHRISTIAN = "נוצרי";
-    case CHRISTIAN_ARAB = "ערבי נוצרי";
-    case MOSLEM = "מוסלמי";
-    case UNKNOWN = "לא ידוע";
+    case JEW = 'יהודי';
+    case BEDOUIN = 'בדואי';
+    case DRUZE = 'דרוזי';
+    case CHRISTIAN = 'נוצרי';
+    case CHRISTIAN_ARAB = 'ערבי נוצרי';
+    case MOSLEM = 'מוסלמי';
+    case UNKNOWN = 'לא ידוע';
 
-    public static function fromValue(string $value): self
+    public static function validateReligion(?string $value): ?string
     {
         return match ($value) {
-            'יהודי' => self::JEW,
-            'בדואי' => self::BEDOUIN,
-            'דרוזי' => self::DRUZE,
-            'נוצרי' => self::CHRISTIAN,
-            'ערבי נוצרי' => self::CHRISTIAN_ARAB,
-            'מוסלמי' => self::MOSLEM,
-            default => new self('לא ידוע'), // Assuming "לא ידוע" means "unknown"
+            self::JEW->value, self::BEDOUIN->value, self::DRUZE->value,
+            self::CHRISTIAN->value, self::CHRISTIAN_ARAB->value, self::MOSLEM->value,
+            self::UNKNOWN->value => $value,
+            default => null,
         };
     }
 }

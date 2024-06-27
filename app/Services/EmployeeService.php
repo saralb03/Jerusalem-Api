@@ -22,89 +22,56 @@ class EmployeeService
             }
             $validColumns[] = ValidColumns::from($column)->toSnake();
         }
-
         $employees = Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
             ->when($validColumns, function ($query) use ($validColumns) {
                 $query->select($validColumns);
             })
             ->get();
-
         return $employees;
     }
 
-    public function update(string $filePath): Status | string
-    {
 
+    public function update(string $filePath, bool $createDetails): Status | string
+    {
         if (!file_exists($filePath)) {
             return Status::NOT_FOUND;
         }
 
-        $fileContents = file($filePath);
-        $headers = str_getcsv(array_shift($fileContents));
-        $employeeDTOs = [];
-        foreach ($fileContents as $line) {
-            $data = str_getcsv($line);
-            $employeeData = array_combine($headers, $data);
-            $employeeDTO = new EmployeeDTO($employeeData);
-            if (!EmployeeValidator::validate((array) $employeeDTO)) {
-                continue;
-            }
-            $employeeDTO->convertDTO();
-            $employeeDTOs[] = $employeeDTO;
-        }
-
-        DB::beginTransaction();
         try {
-            foreach ($employeeDTOs as $dto) {
+            $fileContents = file($filePath);
+            $headers = str_getcsv(array_shift($fileContents));
+
+            DB::beginTransaction();
+
+            foreach ($fileContents as $line) {
+                $data = str_getcsv($line);
+                $employeeData = array_combine($headers, $data);
+                $employeeDTO = new EmployeeDTO($employeeData);
+
+                if (!EmployeeValidator::validate((array) $employeeDTO)) {
+                    continue;
+                }
+                
+                $employeeDTO->convertDTO();
                 $employee = Employee::updateOrCreate(
-                    ['personal_number' => $dto->personal_number],
-                    (array)$dto
+                    ['personal_number' => $employeeDTO->personal_number],
+                    (array)$employeeDTO
                 );
 
-                $dto->employee_id = $employee->id;
+                if (!$createDetails) {
+                    continue;
+                }
+
+                $employeeDTO->employee_id = $employee->id;
                 Details::updateOrCreate(
-                    ['employee_id' => $dto->employee_id],
-                    (array)$dto
+                    ['employee_id' => $employeeDTO->employee_id],
+                    (array)$employeeDTO
                 );
             }
-
             DB::commit();
             return Status::OK;
         } catch (\Exception $e) {
             DB::rollBack();
-            return $e->getMessage();
-        }
-    }
-
-
-    public function import(string $file): Status|string
-    {
-        if (!$file) {
-            return Status::NOT_FOUND;
-        }
-        
-        try {
-            $fileContents = file($file);
-            dd($fileContents);
-            $headers = str_getcsv(array_shift($fileContents));
-
-            foreach ($fileContents as $line) {
-                $data = str_getcsv($line);
-                $rowData = array_combine($headers, $data);
-                $employeeDTO = new EmployeeDTO($rowData);
-                if (!EmployeeValidator::validate((array) $employeeDTO)) {
-                    continue;
-                }
-                $employeeDTO->convertDTO();
-                
-                Employee::updateOrCreate(
-                    ['personal_number' => $employeeDTO->personal_number],
-                    (array) $employeeDTO
-                );
-            }
-
-            return Status::OK;
-        } catch (\Exception $e) {
             return $e->getMessage();
         }
     }
