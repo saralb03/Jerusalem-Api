@@ -13,23 +13,16 @@ enum Population: string
 
     public function getPrefix(): ?string
     {
-        switch ($this) {
-            case self::CIVILAN:
-                return 'c';
-            case self::DUTY:
-            case self::DISCHARGE:
-            case self::REGULARITY:
-                return 's';
-            case self::RESERVES:
-                return 'm';
-            case self::CONTRACT_WORKER:
-                return 'o';
-            default:
-                return null;
-        }
+        return match ($this) {
+            self::CIVILAN =>  'c',
+            self::DUTY, self::DISCHARGE, self::REGULARITY => 's',
+            self::RESERVES => 'm',
+            self::CONTRACT_WORKER => 'o',
+            default => null,
+        };
     }
 
-    public static function getValid($population): ?string
+    public static function getValid(?string $population): ?string
     {
         return match ($population) {
             'אזרח', 'עובד צה"ל' => self::CIVILAN->value,
@@ -37,7 +30,7 @@ enum Population: string
             'חובה' => self::DUTY->value,
             'פטורים' => self::DISCHARGE->value,
             'מילואים', 'מילואים מתנדבים' => self::RESERVES->value,
-            'עובד קבלן' , 'יועץ' => self::CONTRACT_WORKER->value,
+            'עובד קבלן', 'יועץ' => self::CONTRACT_WORKER->value,
             default => null,
         };
     }
