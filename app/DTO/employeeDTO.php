@@ -4,6 +4,7 @@ namespace App\DTO;
 
 use App\Enums\ClassificationName;
 use App\Enums\Population;
+use App\Enums\Rank;
 use App\Enums\Religion;
 
 class EmployeeDTO
@@ -49,14 +50,8 @@ class EmployeeDTO
         $this->security_class_start_date = $data['תאריך מתן סיווג נוכחי'] ?? null;
         $this->age = $data['גיל'] ?? null;
         $this->classification = $data['סב"ט נוכחי'] ?? null;
-        // if ($data['טלפון']){
-        //     $this->phone_number = $data['טלפון'];
-        // }else if($data['קידומת מספר טלפון'] && $data['מספר טלפון']){
-        //     $this->phone_number = $data['קידומת מספר טלפון'] . $data['מספר טלפון'];
-        // }
         $this->phone_number = $data['טלפון']
             ?? ($data['קידומת מספר טלפון'] ?? '' && $data['מספר טלפון'] ?? '' ? $data['קידומת מספר טלפון'] . $data['מספר טלפון'] : null);
-
         $this->profession = $data['מקצוע'] ?? null;
         $this->gender = $data['מין'] ?? null;
         $this->religion = $data['דת'] ?? null;
@@ -111,14 +106,16 @@ class EmployeeDTO
     {
         $this->personal_id = str_pad($this->personal_id, 11, '0', STR_PAD_LEFT);
         $this->convertPersonalNumber();
+        $this->population = Population::getValid($this->population);
         $this->prefix = Population::from($this->population)->getPrefix();
-        $this->rank = $this->rank ? preg_replace('/[^\p{Hebrew}\s]/u', '', $this->rank) : null;
+        $this->rank = Rank::fromHebrew($this->rank);
         $this->first_name = $this->convertName($this->first_name);
         $this->surname = $this->convertName($this->surname);
         $this->date_of_birth = $this->convertDate($this->date_of_birth);
         $this->security_class_start_date = $this->convertDate($this->security_class_start_date);
         $this->classification_name = ClassificationName::toHebrew($this->classification);
         $this->convertPhone();
+        $this->religion = Religion::validateReligion($this->religion);
         $this->release_date = $this->convertDate($this->release_date);
         $this->user_name =  $this->user_name ? 'army\\' . $this->prefix . $this->personal_number : $this->user_name;
     }
