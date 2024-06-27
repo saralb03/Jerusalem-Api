@@ -15,13 +15,7 @@ class EmployeeService
 {
     public function index(array $requestedColumns): Collection
     {
-        $validColumns = [];
-        foreach ($requestedColumns as $column) {
-            if (!ValidColumns::isValidColumn($column)) {
-                continue;
-            }
-            $validColumns[] = ValidColumns::from($column)->toSnake();
-        }
+        $validColumns = array_map('Str::snake', $requestedColumns);
 
         $employees = Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
             ->when($validColumns, function ($query) use ($validColumns) {
@@ -82,7 +76,7 @@ class EmployeeService
         if (!$file) {
             return Status::NOT_FOUND;
         }
-        
+
         try {
             $fileContents = file($file);
             dd($fileContents);
@@ -96,7 +90,7 @@ class EmployeeService
                     continue;
                 }
                 $employeeDTO->convertDTO();
-                
+
                 Employee::updateOrCreate(
                     ['personal_number' => $employeeDTO->personal_number],
                     (array) $employeeDTO

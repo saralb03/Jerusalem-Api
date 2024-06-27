@@ -48,14 +48,8 @@ class EmployeeDTO
         $this->security_class_start_date = $data['תאריך מתן סיווג נוכחי'] ?? null;
         $this->age = $data['גיל'] ?? null;
         $this->classification = $data['סב"ט נוכחי'] ?? null;
-        // if ($data['טלפון']){
-        //     $this->phone_number = $data['טלפון'];
-        // }else if($data['קידומת מספר טלפון'] && $data['מספר טלפון']){
-        //     $this->phone_number = $data['קידומת מספר טלפון'] . $data['מספר טלפון'];
-        // }
         $this->phone_number = $data['טלפון']
             ?? ($data['קידומת מספר טלפון'] ?? '' && $data['מספר טלפון'] ?? '' ? $data['קידומת מספר טלפון'] . $data['מספר טלפון'] : null);
-
         $this->profession = $data['מקצוע'] ?? null;
         $this->gender = $data['מין'] ?? null;
         $this->religion = $data['דת'] ?? null;
