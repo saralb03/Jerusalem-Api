@@ -52,12 +52,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class EmployeeController extends Controller
 {
-    // protected $employeeService;
-
-    // public function __construct(EmployeeService $employeeService)
-    // {
-    //     $this->employeeService = $employeeService;
-    // }
 
     public function __construct(public readonly EmployeeService $employeeService)
     {
@@ -158,7 +152,7 @@ class EmployeeController extends Controller
         return match ($result) {
             Status::NOT_FOUND => response()->json(['error' => 'No file uploaded.'], Response::HTTP_NOT_FOUND),
             Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),
-            default => response()->json(['error' => 'Error importing CSV file: ' . $result], Response::HTTP_INTERNAL_SERVER_ERROR),
+            default => response()->json(['error' => 'Error importing CSV file.'], Response::HTTP_INTERNAL_SERVER_ERROR),
         };
     }
 
@@ -169,7 +163,7 @@ class EmployeeController extends Controller
         return match ($result) {
             Status::NOT_FOUND => response()->json(['error' => 'File not found.'], Response::HTTP_NOT_FOUND),
             Status::OK => response()->json(['message' => 'CSV file imported successfully'], Response::HTTP_OK),
-            default => response()->json(['error' => 'Error importing CSV file: ' . $result], Response::HTTP_INTERNAL_SERVER_ERROR),
+            default => response()->json(['error' => 'Error importing CSV file.'], Response::HTTP_INTERNAL_SERVER_ERROR),
         };
     }
 }
