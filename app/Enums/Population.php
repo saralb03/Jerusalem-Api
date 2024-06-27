@@ -16,15 +16,15 @@ enum Population: string
     {
         switch ($this) {
             case self::MISSION_CIVILAN:
-                return 'C';
+                return 'c';
             case self::DUTY:
             case self::DUTY_REGULARITY:
             case self::DISCHARGE:
             case self::REGULARITY:
-                return 'S';
+                return 's';
             case self::RESERVES:
             case self::VOLUNTERR_RESERVES:
-                return 'M';
+                return 'm';
             default:
                 return null;
         }
