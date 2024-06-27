@@ -15,13 +15,8 @@ Route::get('/token', [TokenController::class, 'createToken']);
 Route::get('/token/{token}', [TokenController::class, 'verifytoken']);
 Route::get('/users', [UserController::class, 'show']);
 
-Route::get('/test', function(){
-    $user = $_SERVER['AUTH_USER'];
-
-    dd($user);
-});
-
 Route::controller(AuthController::class)
+    ->middleware('guest')
     ->group(function () {
         Route::post('/login', 'login');
     });

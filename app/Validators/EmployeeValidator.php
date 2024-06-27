@@ -2,7 +2,6 @@
 namespace App\Validators;
 use App\Enums\Division;
 use Illuminate\Support\Facades\Validator;
-use App\Enums\Religion;
 use Illuminate\Validation\Rule;
 class EmployeeValidator
 {

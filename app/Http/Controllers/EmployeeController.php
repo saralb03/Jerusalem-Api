@@ -52,10 +52,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class EmployeeController extends Controller
 {
-
-    public function __construct(public readonly EmployeeService $employeeService)
-    {
-    }
+  
+    public function __construct(public readonly EmployeeService $employeeService) {}
 
     /**
      * @OA\Get(
