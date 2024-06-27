@@ -9,7 +9,6 @@ use App\Models\Details;
 use App\Models\Employee;
 use App\Validators\EmployeeValidator;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\File;
 use Illuminate\Support\Facades\DB;
 
 class EmployeeService
@@ -33,31 +32,8 @@ class EmployeeService
         return $employees;
     }
 
-    // public function index1(array $requestedColumns): Collection
-    // {
-    //     $validColumns = [];
-    //     foreach ($requestedColumns as $column) {
-    //         if (!ValidColumns::isValidColumn($column)) {
-    //             continue;
-    //         }
-    //         $validColumns[] = ValidColumns::from($column)->toSnake();
-    //     }
-
-    //     $employees = Employee::leftJoin('details', 'employees.id', '=', 'details.employee_id')
-    //         ->when($validColumns, function ($query) use ($validColumns) {
-    //             $query->select($validColumns);
-    //         })
-    //         ->whereNull('details.id') // Add this line to filter out employees with no details
-    //         ->select('employees.*')
-    //         ->get();
-
-    //     return $employees;
-    // }
-
     public function update(string $filePath): Status | string
     {
-        // $filePath = "C:\\Users\\Emet-Dev-23\\Desktop\\Projects\\employees.csv";
-        // $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees-2.csv";
 
         if (!file_exists($filePath)) {
             return Status::NOT_FOUND;
@@ -86,7 +62,7 @@ class EmployeeService
                 );
 
                 $dto->employee_id = $employee->id;
-                $details =Details::updateOrCreate(
+                Details::updateOrCreate(
                     ['employee_id' => $dto->employee_id],
                     (array)$dto
                 );
@@ -101,26 +77,29 @@ class EmployeeService
     }
 
 
-    public function import(File $file): Status|string
+    public function import(string $file): Status|string
     {
         if (!$file) {
             return Status::NOT_FOUND;
         }
-
+        
         try {
-            $fileContents = file($file->getPathname());
+            $fileContents = file($file);
+            dd($fileContents);
             $headers = str_getcsv(array_shift($fileContents));
 
             foreach ($fileContents as $line) {
                 $data = str_getcsv($line);
                 $rowData = array_combine($headers, $data);
+                $employeeDTO = new EmployeeDTO($rowData);
+                if (!EmployeeValidator::validate((array) $employeeDTO)) {
+                    continue;
+                }
+                $employeeDTO->convertDTO();
+                
                 Employee::updateOrCreate(
-                    [
-                        'personal_number' => $rowData["personal_number"],
-                    ],
-                    [
-                        'user_name' => $rowData["user_name"],
-                    ]
+                    ['personal_number' => $employeeDTO->personal_number],
+                    (array) $employeeDTO
                 );
             }
 

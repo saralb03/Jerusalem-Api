@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::call(function () {
     try {
         $employeeService = new EmployeeService();
-        $employeeService->update("C:\\Users\\Emet-Dev\\Documents\\New folder\\employees-2.csv");
+        $employeeService->update(env('DAILY_FILE_ADDRESS'));
         Log::info('Employees updated successfully.');
     } catch (\Exception $e) {
         Log::error($e->getMessage());

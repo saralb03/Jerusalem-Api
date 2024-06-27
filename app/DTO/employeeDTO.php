@@ -1,7 +1,10 @@
 <?php
+
 namespace App\DTO;
+
 use App\Enums\ClassificationName;
 use App\Enums\Population;
+
 class EmployeeDTO
 {
     public $personal_id;
@@ -28,29 +31,39 @@ class EmployeeDTO
     public $country_of_birth;
     public $release_date;
     public $employee_id;
+
     public function __construct(array $data)
     {
         $this->personal_id = $data['תז'] ?? $data['ת"ז'];
         $this->personal_number = $data['מספר אישי'];
         $this->first_name = $data['שם פרטי'];
         $this->surname = $data['שם משפחה'];
-        $this->population = $data['סוג שרות'] ?? $data['סוג שירות'];
-        $this->rank = $data['דרגה'];
+        $this->population = $data['סוג שרות'] ?? $data['סוג שירות'] ?? $data['אוכלוסיה'];
+        $this->rank = $data['דרגה'] ?? null;
         $this->department = $data['מחלקה'] ?? null;
         $this->branch = $data['ענף'] ?? null;
         $this->section = $data['מדור'] ?? null;
-        $this->division = $data['יחידת רישום'];
-        $this->date_of_birth = $data['תאריך לידה'];
+        $this->division = $data['יחידת רישום'] ?? null;
+        $this->date_of_birth = $data['תאריך לידה'] ?? null;
         $this->security_class_start_date = $data['תאריך מתן סיווג נוכחי'] ?? null;
         $this->age = $data['גיל'] ?? null;
         $this->classification = $data['סב"ט נוכחי'] ?? null;
-        $this->phone_number = $data['טלפון'] ?? $data['קידומת מספר טלפון'] . $data['מספר טלפון'];
+        // if ($data['טלפון']){
+        //     $this->phone_number = $data['טלפון'];
+        // }else if($data['קידומת מספר טלפון'] && $data['מספר טלפון']){
+        //     $this->phone_number = $data['קידומת מספר טלפון'] . $data['מספר טלפון'];
+        // }
+        $this->phone_number = $data['טלפון']
+            ?? ($data['קידומת מספר טלפון'] ?? '' && $data['מספר טלפון'] ?? '' ? $data['קידומת מספר טלפון'] . $data['מספר טלפון'] : null);
+
         $this->profession = $data['מקצוע'] ?? null;
         $this->gender = $data['מין'] ?? null;
         $this->religion = $data['דת'] ?? null;
         $this->country_of_birth = $data['ארץ לידה'] ?? null;
-        $this->release_date = $data['תאריך שחרור'];
+        $this->release_date = $data['תאריך שחרור'] ?? null;
+        $this->user_name = $data['שם משתמש'] ?? null;
     }
+
     private function convertPersonalNumber(): void
     {
         $length = strlen($this->personal_number);
@@ -58,22 +71,27 @@ class EmployeeDTO
             $this->personal_number =  substr($this->personal_number, $length - 9, 7);
         }
     }
+
     private function convertName(string $name): string
     {
         $name = str_replace(['-', '_'], ' ', $name);
         $name = preg_replace('/[^\p{Hebrew}\s]/u', '', $name);
         return $name;
     }
+
     private function convertDate($date): ?string
     {
+        if (!$date) return null;
         if ($date) {
             $date = \DateTime::createFromFormat('d.m.Y', $date);
             return $date ? $date->format('Y-m-d') : null;
         }
         return null;
     }
+
     private function convertPhone(): void
     {
+        if (!$this->phone_number) return;
         $phone = preg_replace('/[^0-9]/', '', $this->phone_number);
         if (strlen($phone) == 9 && $phone[0] !== '0') {
             $this->phone_number = '0' . $phone;
@@ -83,12 +101,13 @@ class EmployeeDTO
             $this->phone_number = substr($phone, 0, 3) . '-' . substr($phone, 3);
         }
     }
+
     public function convertDTO(): void
     {
         $this->personal_id = str_pad($this->personal_id, 11, '0', STR_PAD_LEFT);
         $this->convertPersonalNumber();
         $this->prefix = Population::from($this->population)->getPrefix();
-        $this->rank = preg_replace('/[^\p{Hebrew}\s]/u', '', $this->rank);
+        $this->rank = $this->rank ? preg_replace('/[^\p{Hebrew}\s]/u', '', $this->rank) : null;
         $this->first_name = $this->convertName($this->first_name);
         $this->surname = $this->convertName($this->surname);
         $this->date_of_birth = $this->convertDate($this->date_of_birth);
@@ -96,6 +115,6 @@ class EmployeeDTO
         $this->classification_name = ClassificationName::toHebrew($this->classification);
         $this->convertPhone();
         $this->release_date = $this->convertDate($this->release_date);
-        $this->user_name =  'army\\' . $this->prefix . $this->personal_number;
+        $this->user_name =  $this->user_name ? 'army\\' . $this->prefix . $this->personal_number : $this->user_name;
     }
 }

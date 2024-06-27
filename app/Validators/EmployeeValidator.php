@@ -1,9 +1,10 @@
 <?php
-
 namespace App\Validators;
 use App\Enums\Division;
 use Illuminate\Support\Facades\Validator;
 use App\Enums\Population;
+use App\Enums\Rank;
+use App\Enums\Religion;
 use Illuminate\Validation\Rule;
 class EmployeeValidator
 {
@@ -19,25 +20,33 @@ class EmployeeValidator
                 'string',
                 Rule::in(Population::cases()),
             ],
-            'rank' => 'required|string',
+            'rank' => [
+               'nullable',
+               'string',
+               Rule::in(Rank::cases()),
+            ],
             'department' => 'nullable|string',
             'branch' => 'nullable|string',
             'section' => 'nullable|string',
             'division' => [
-                'required',
+                'nullable',
                 'string',
                 Rule::in(Division::cases()),
             ],
-            'date_of_birth' => 'required',
+            'date_of_birth' => 'nullable',
             'security_class_start_date' => 'nullable',
             'age' => 'nullable|integer',
             'classification' => 'nullable|integer|min:1|max:5',
-            'phone_number' => 'required|string',
+            'phone_number' => 'nullable|string',
             'profession' => 'nullable|string',
             'gender' => 'nullable|string',
-            'religion' => 'nullable|string',
+            'religion' => [
+                'nullable',
+                'string',
+                Rule::in(Religion::cases()),
+            ],
             'country_of_birth' => 'nullable|string',
-            'release_date' => 'required',
+            'release_date' => 'nullable',
         ]);
         return $validator->passes();
     }
