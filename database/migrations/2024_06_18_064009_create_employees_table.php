@@ -13,23 +13,13 @@ return new class extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->string('personal_id');
-            $table->string('personal_number');
-            $table->string('ranks');
-            $table->string('surname');
-            $table->string('first_name');
-            $table->string('department');
-            $table->string('division');
-            $table->string('service_type');
-            $table->date('date_of_birth');
-            $table->string('service_type_code');
-            $table->date('security_class_start_date');
-            $table->date('service_start_date');
-            $table->string('solider_type');
-            $table->integer('age');
-            $table->string('classification');
-            $table->string('phone_number');
-            $table->softDeletes();
+            $table->string('personal_id')->nullable()->unique();
+            $table->string('personal_number')->nullable()->unique();
+            $table->string('first_name')->nullable();
+            $table->string('surname')->nullable();
+            $table->string('user_name')->nullable()->unique();
+            $table->string('population')->nullable();
+            $table->string('prefix')->nullable();
             $table->timestamps();
         });
     }

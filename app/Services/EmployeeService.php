@@ -3,113 +3,108 @@
 namespace App\Services;
 
 use App\DTO\EmployeeDTO;
+use App\Enums\Status;
+use App\Enums\ValidColumns;
+use App\Models\Details;
 use App\Models\Employee;
-use Carbon\Carbon;
+use App\Validators\EmployeeValidator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Collection;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class EmployeeService
 {
-    public function index(): Collection
+    public function index(array $requestedColumns): Collection
     {
-        $employees = Employee::withTrashed()
-            ->get();
-
-        return $employees;
-    }
-
-    public function updateData()
-    {
-        $employees = Employee::query()
-            ->get();
-
-        foreach ($employees as $employee) {
-            $employee->update([
-                'updated_at' => Carbon::now()
-            ]);
+        $validColumns = [];
+        foreach ($requestedColumns as $column) {
+            $validColumns[] = ValidColumns::from($column)->toSnake();
         }
+
+        return Employee::join('details', 'employees.id', '=', 'details.employee_id')
+            ->when($validColumns, function ($query) use ($validColumns) {
+                $query->select($validColumns);
+            })
+            ->get();
     }
 
-    public function update(Request $request)
+    private static function getKey(string $hebrewKey): string
     {
-        $filePath = "C:\\Users\\Emet-Dev\\Documents\\New folder\\employees.csv";
-    
-        // Column mapping from CSV to database
-        $columnMapping = [
-            'תז' => 'personal_id',
+        return match ($hebrewKey) {
+            'תז', 'ת"ז' => 'personal_id',
             'מספר אישי' => 'personal_number',
-            'דרגה' => 'ranks',
-            'שם משפחה' => 'surname',
             'שם פרטי' => 'first_name',
+            'שם משפחה' => 'surname',
+            'סוג שרות', 'סוג שירות', 'אוכלוסיה' => 'population',
+            'דרגה' => 'rank',
             'מחלקה' => 'department',
-            'יחידה' => 'division',
-            'סוג שרות' => 'service_type',
+            'ענף' => 'branch',
+            'מדור' => 'section',
+            'יחידת רישום' => 'division',
             'תאריך לידה' => 'date_of_birth',
-            'קוד סוג ש' => 'service_type_code',
-            'תאריך תחילת סוש' => 'security_class_start_date',
-            'תאריך תחילת שרות' => 'service_start_date',
-            'סוג חייל' => 'solider_type',
+            'תאריך מתן סיווג נוכחי' => 'security_class_start_date',
             'גיל' => 'age',
-            'סיווג' => 'classification',
+            'סב"ט נוכחי' => 'classification',
             'טלפון' => 'phone_number',
-        ];
-    
-        if (file_exists($filePath)) {
+            'קידומת מספר טלפון',  => 'prefix_phone',
+            'מספר טלפון' => 'suffix_phone',
+            'מקצוע' => 'profession',
+            'מין' => 'gender',
+            'דת' => 'religion',
+            'ארץ לידה' => 'country_of_birth',
+            'תאריך שחרור' => 'release_date',
+            'שם משתמש' => 'user_name',
+            default => '',
+        };
+    }
+
+    public function update(string $filePath, bool $createDetails): Status
+    {
+        if (!file_exists($filePath)) {
+            return Status::NOT_FOUND;
+        }
+
+        try {
             $fileContents = file($filePath);
-    
             $headers = str_getcsv(array_shift($fileContents));
-            $dbHeaders = array_map(function($header) use ($columnMapping) {
-                return $columnMapping[$header] ?? null;
-            }, $headers);
-    
-            $employeeDTOs = [];
-            $csvPersonalIds = [];
-    
+            $englishHeaders = collect($headers)->map(function ($header) {
+                return EmployeeService::getKey($header);
+            })->toArray();
+            
+            DB::beginTransaction();
+
             foreach ($fileContents as $line) {
                 $data = str_getcsv($line);
-                $employeeData = array_combine($dbHeaders, $data);
-    
-                $dto = new EmployeeDTO($employeeData);
-    
-                // Validate DTO
-                // if (EmployeeValidator::validate($dto)) {
-                    $employeeDTOs[] = $dto;
-                    $csvPersonalIds[] = $dto->personal_id;
-                // }
-            }
-    
-            DB::beginTransaction();
-            try {
-                // Soft delete employees not in the CSV
-                Employee::whereNotIn('personal_id', $csvPersonalIds)->delete();
-    
-                // Save all valid DTOs to the database using updateOrCreate
-                foreach ($employeeDTOs as $dto) {
-                    $employee = Employee::withTrashed()->updateOrCreate(
-                        ['personal_id' => $dto->personal_id],
-                        (array)$dto
-                    );
-    
-                    // Restore if it was soft deleted
-                    if ($employee->trashed()) {
-                        $employee->restore();
-                    }
+                $employeeData = array_combine($englishHeaders, $data);
+                $employeeDTO = new EmployeeDTO($employeeData);
+                
+                if (!EmployeeValidator::validate((array) $employeeDTO)) {
+                    continue;
                 }
-    
-                // Commit the transaction
-                DB::commit();
-    
-                return redirect()->back()->with('success', 'CSV file imported successfully.');
-            } catch (\Exception $e) {
-                // Rollback the transaction on error
-                DB::rollBack();
-    
-                return redirect()->back()->with('error', 'Error importing CSV file: ' . $e->getMessage());
+
+                $employeeDTO->convertDTO();
+                $employee = Employee::updateOrCreate(
+                    ['personal_number' => $employeeDTO->personal_number],
+                    (array)$employeeDTO
+                );
+
+                if (!$createDetails) {
+                    continue;
+                }
+
+                $employeeDTO->employee_id = $employee->id;
+                Details::updateOrCreate(
+                    ['employee_id' => $employeeDTO->employee_id],
+                    (array)$employeeDTO
+                );
             }
+            DB::commit();
+            return Status::OK;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
         }
-    
-        return redirect()->back()->with('error', 'File not found.');
+
+        return Status::ERROR;
     }
-    
 }

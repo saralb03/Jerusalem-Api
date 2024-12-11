@@ -1,0 +1,251 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Employee API",
+        "description": "API documentation for managing employees",
+        "contact": {
+            "name": "API Support",
+            "email": "contact@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/employees": {
+            "get": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Get employees with optional filtering of columns",
+                "operationId": "7fc06f144c1cd7925c5c391a6609f02d",
+                "parameters": [
+                    {
+                        "name": "columns",
+                        "in": "query",
+                        "description": "Comma-separated list of columns to retrieve",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "personal_id,personal_number,rank,surname,first_name,department,division,date_of_birth,age,phone_number"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of employees",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Employee"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
+        "/api/employees/import": {
+            "post": {
+                "tags": [
+                    "Employees"
+                ],
+                "summary": "Import employees from a CSV file",
+                "operationId": "bcf779aeb89f42d52e8445b5e8897cd6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "description": "CSV file to be uploaded",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "CSV file imported successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "CSV file imported successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No file uploaded",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "No file uploaded."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error importing CSV file",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error importing CSV file: [error message]"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Employee": {
+                "required": [
+                    "personal_id",
+                    "personal_number",
+                    "first_name",
+                    "surname",
+                    "rank",
+                    "division",
+                    "date_of_birth",
+                    "age",
+                    "phone_number"
+                ],
+                "properties": {
+                    "personal_id": {
+                        "type": "string",
+                        "example": "00305948276"
+                    },
+                    "personal_number": {
+                        "type": "string",
+                        "example": "3259689"
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "אדם"
+                    },
+                    "surname": {
+                        "type": "string",
+                        "example": "הראשון"
+                    },
+                    "user_name": {
+                        "type": "string",
+                        "example": "army\\s3259687"
+                    },
+                    "population": {
+                        "type": "string",
+                        "example": "קבע"
+                    },
+                    "prefix": {
+                        "type": "string",
+                        "example": "s"
+                    },
+                    "rank": {
+                        "type": "string",
+                        "example": "סגן"
+                    },
+                    "department": {
+                        "type": "string",
+                        "example": null
+                    },
+                    "branch": {
+                        "type": "string",
+                        "example": null
+                    },
+                    "section": {
+                        "type": "string",
+                        "example": null
+                    },
+                    "division": {
+                        "type": "string",
+                        "example": "בסיס 128 לשכות"
+                    },
+                    "date_of_birth": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2005-04-10"
+                    },
+                    "security_class_start_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2012-09-04"
+                    },
+                    "age": {
+                        "type": "integer",
+                        "example": 19
+                    },
+                    "classification": {
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "classification_name": {
+                        "type": "string",
+                        "example": "סודי ביותר"
+                    },
+                    "phone_number": {
+                        "type": "string",
+                        "example": "0559254116"
+                    },
+                    "profession": {
+                        "type": "string",
+                        "example": "פסנתרן"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "example": "זכר"
+                    },
+                    "religion": {
+                        "type": "string",
+                        "example": "יהודי"
+                    },
+                    "country_of_birth": {
+                        "type": "string",
+                        "example": "ישראל"
+                    },
+                    "release_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2013-09-04"
+                    },
+                    "employee_id": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            }
+        }
+    }
+}
